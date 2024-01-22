@@ -15,3 +15,7 @@ export async function GET(request: Request) {
 //   const orders = await sql`SELECT * FROM Orders;`;
 //   return NextResponse.json({ orders }, { status: 200 });
 }
+
+// CREATE TABLE Orders ( Time timestamp with time zone, Name varchar(255), Item varchar(255), Paid boolean );
+
+// DROP TABLE orders;
