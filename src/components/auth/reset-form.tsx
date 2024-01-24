@@ -17,13 +17,13 @@ import {
 } from "@/components/ui/form";
 import { CardWrapper } from "@/components/auth/card-wrapper";
 import { Button } from "@/components/ui/button";
-import { login } from "@/actions/login";
+import { reset } from "@/actions/reset";
 
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
-import Link from "next/link";
+import { ResetSchema } from "@/schemas";
 
-export const LoginForm = () => {
+export const ResetForm = () => {
   //   const searchParams = useSearchParams();
   //   let urlError = "";
   //   if (searchParams.get("error") === "OAuthAccountNotLinked") {
@@ -33,17 +33,16 @@ export const LoginForm = () => {
 
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<z.infer<typeof LoginSchema>>({
-    resolver: zodResolver(LoginSchema),
+  const form = useForm<z.infer<typeof ResetSchema>>({
+    resolver: zodResolver(ResetSchema),
     defaultValues: {
       email: "",
-      password: "",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+  const onSubmit = (values: z.infer<typeof ResetSchema>) => {
     startTransition(() => {
-      login(values).then((data) => {
+      reset(values).then((data) => {
         if (data.success != undefined && data.success != "") {
           toast.success(data.success);
         }
@@ -51,7 +50,6 @@ export const LoginForm = () => {
           toast.error(data.error);
         }
       });
-
       //   toast.promise(promise, {
       //     loading: `Loggin in ...`,
       //     success: (data) => {
@@ -65,12 +63,12 @@ export const LoginForm = () => {
   return (
     <>
       <CardWrapper
-        headerTitle="Welcome back!"
-        headerLabel="Login to the drink server"
-        backButtonLabel="Don't have an account?"
-        backButtonHref="/auth/register"
-        showSocial
-        useCollapsible
+        headerTitle="Reset Password"
+        headerLabel="Forgot your password?"
+        backButtonLabel="Back to login"
+        backButtonHref="/auth/login"
+        showSocial={false}
+        useCollapsible={false}
         collapsibleLabel="CONTINUE WITH EMAIL"
       >
         <Form {...form}>
@@ -94,35 +92,9 @@ export const LoginForm = () => {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        disabled={isPending}
-                        placeholder="******"
-                        type="password"
-                      />
-                    </FormControl>
-                    <Button
-                      size="sm"
-                      variant="link"
-                      asChild
-                      className="px-0 font-normal"
-                    >
-                      <Link href="/auth/reset">Forgot password?</Link>
-                    </Button>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
             <Button disabled={isPending} type="submit" className="w-full">
-              Login
+              Send reset email
             </Button>
           </form>
         </Form>

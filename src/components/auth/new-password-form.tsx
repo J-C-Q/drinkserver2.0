@@ -17,33 +17,28 @@ import {
 } from "@/components/ui/form";
 import { CardWrapper } from "@/components/auth/card-wrapper";
 import { Button } from "@/components/ui/button";
-import { login } from "@/actions/login";
+import { newPassword } from "@/actions/new-password";
 
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
-import Link from "next/link";
+import { NewPasswordSchema } from "@/schemas";
 
-export const LoginForm = () => {
-  //   const searchParams = useSearchParams();
-  //   let urlError = "";
-  //   if (searchParams.get("error") === "OAuthAccountNotLinked") {
-  //     urlError = "Email already in use with different provider";
-  //     // toast.error(urlError);
-  //   }
+export const NewPasswordForm = () => {
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
 
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<z.infer<typeof LoginSchema>>({
-    resolver: zodResolver(LoginSchema),
+  const form = useForm<z.infer<typeof NewPasswordSchema>>({
+    resolver: zodResolver(NewPasswordSchema),
     defaultValues: {
-      email: "",
       password: "",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+  const onSubmit = (values: z.infer<typeof NewPasswordSchema>) => {
     startTransition(() => {
-      login(values).then((data) => {
+      newPassword(values, token).then((data) => {
         if (data.success != undefined && data.success != "") {
           toast.success(data.success);
         }
@@ -51,7 +46,6 @@ export const LoginForm = () => {
           toast.error(data.error);
         }
       });
-
       //   toast.promise(promise, {
       //     loading: `Loggin in ...`,
       //     success: (data) => {
@@ -65,12 +59,12 @@ export const LoginForm = () => {
   return (
     <>
       <CardWrapper
-        headerTitle="Welcome back!"
-        headerLabel="Login to the drink server"
-        backButtonLabel="Don't have an account?"
-        backButtonHref="/auth/register"
-        showSocial
-        useCollapsible
+        headerTitle="New Password"
+        headerLabel="Enter a new password"
+        backButtonLabel="Back to login"
+        backButtonHref="/auth/login"
+        showSocial={false}
+        useCollapsible={false}
         collapsibleLabel="CONTINUE WITH EMAIL"
       >
         <Form {...form}>
@@ -78,28 +72,10 @@ export const LoginForm = () => {
             <div className="space-y-4">
               <FormField
                 control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        disabled={isPending}
-                        placeholder="john.doe@example.com"
-                        type="email"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>New password</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -108,21 +84,13 @@ export const LoginForm = () => {
                         type="password"
                       />
                     </FormControl>
-                    <Button
-                      size="sm"
-                      variant="link"
-                      asChild
-                      className="px-0 font-normal"
-                    >
-                      <Link href="/auth/reset">Forgot password?</Link>
-                    </Button>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
             <Button disabled={isPending} type="submit" className="w-full">
-              Login
+              Reset password
             </Button>
           </form>
         </Form>
