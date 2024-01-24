@@ -3,7 +3,7 @@ import { Poppins } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { LoginButton } from "@/components/auth/login-button";
-import { RegisterButton } from "@/components/auth/register-button";
+import { BsStars } from "react-icons/bs";
 
 const font = Poppins({
   subsets: ["latin"],
@@ -20,7 +20,11 @@ export default function Home() {
             font.className
           )}
         >
-          <span className="text-amber-400">Drink Server 2.0</span>
+          <span className="text-amber-400 relative">
+            Drink Server 2.0
+            {/* <BsStars className="absolute -translate-x-14" /> */}
+            <BsStars className="absolute right-0 -translate-y-28 translate-x-14" />
+          </span>
         </h1>
         <p className="text-white text-lg">
           A tool to keep track of drink consumption in the_office

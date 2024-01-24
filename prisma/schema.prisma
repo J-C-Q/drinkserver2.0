@@ -17,6 +17,12 @@ enum UserRole {
     ADMIN
 }
 
+enum OrderStatus {
+    PENDING
+    COMPLETED
+    CANCELLED
+}
+
 model User {
     id            String    @id @default(cuid())
     name          String?
@@ -65,12 +71,27 @@ model PasswordResetToken {
     @@unique([email, token])
 }
 
-model Orders {
-    orderId   String   @id @default(cuid())
+model Order {
+    orderId   String      @id @default(cuid())
     userId    String
     itemid    String
     itemname  String
-    itemprice Int
+    itemprice Float
     date      DateTime
-    status    String
+    status    OrderStatus @default(PENDING)
+}
+
+model Item {
+    itemid       String  @id @default(cuid())
+    itemname     String
+    itemprice    Float
+    quantity     Int
+    energy       Float?
+    carbohydrate Float?
+    sugar        Float?
+    caffeine     Float?
+    image        String?
+    description  String?
+    bgcolor      String?
+    color        String?
 }

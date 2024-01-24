@@ -71,7 +71,7 @@ export const LoginForm = () => {
         backButtonHref="/auth/register"
         showSocial
         useCollapsible
-        collapsibleLabel="CONTINUE WITH EMAIL"
+        collapsibleLabel="continue with email"
       >
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -86,7 +86,7 @@ export const LoginForm = () => {
                       <Input
                         {...field}
                         disabled={isPending}
-                        placeholder="john.doe@example.com"
+                        placeholder=""
                         type="email"
                       />
                     </FormControl>
@@ -104,7 +104,7 @@ export const LoginForm = () => {
                       <Input
                         {...field}
                         disabled={isPending}
-                        placeholder="******"
+                        placeholder=""
                         type="password"
                       />
                     </FormControl>
@@ -122,7 +122,7 @@ export const LoginForm = () => {
               />
             </div>
             <Button disabled={isPending} type="submit" className="w-full">
-              Login
+              Login with email
             </Button>
           </form>
         </Form>

@@ -1,21 +1,28 @@
-import { sql } from '@vercel/postgres';
+import { auth } from "@/auth";
 import { NextResponse } from 'next/server';
+import {Order} from "@/actions/order";
  
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const name = searchParams.get('name');
-  const item = searchParams.get('item');
-  try {
-    if (!name || !item) throw new Error('Name and item are required');
-    await sql`INSERT INTO Orders (Time, Name, Item, Paid) VALUES (${"now"}, ${name}, ${item}, ${false});`;
-  } catch (error) {
-    return NextResponse.json({ error }, { status: 500 });
+  const userid = searchParams.get('userId');
+  const itemid = searchParams.get('itemId');
+ 
+  const session = await auth();
+
+  if (!session) {
+    return NextResponse.json({error: "Not logged in!"});
   }
- return NextResponse.json({ message: 'Order added' }, { status: 200 });
-//   const orders = await sql`SELECT * FROM Orders;`;
-//   return NextResponse.json({ orders }, { status: 200 });
+
+  if(session.user.id !== userid) {
+    return NextResponse.json({error: "Not logged in!"});
+  }
+
+  if(!itemid || !userid) {
+    return NextResponse.json({error: "Missing parameters!"});
+  }
+
+    const result = await Order(itemid,userid);
+
+  return NextResponse.json(result);
+    // const result = await Order(itemid,userid);
 }
-
-// CREATE TABLE Orders ( Time timestamp with time zone, Name varchar(255), Item varchar(255), Paid boolean );
-
-// DROP TABLE orders;
