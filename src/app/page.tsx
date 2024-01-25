@@ -16,18 +16,18 @@ export default function Home() {
       <div className="space-y-6 text-center mx-5">
         <h1
           className={cn(
-            "text-4xl sm:text-6xl font-semibold text-white drop-shadow-0",
+            "text-4xl sm:text-6xl font-semibold text-white drop-shadow-0 relative",
             font.className
           )}
         >
           <span className="text-amber-400 relative">
             Drink Server 2.0
             {/* <BsStars className="absolute -translate-x-14" /> */}
-            <BsStars className="absolute right-0 -translate-y-28 translate-x-14" />
           </span>
+          <BsStars className="absolute right-0 sm:-right-12 -top-10 text-amber-400" />
         </h1>
-        <p className="text-white text-lg">
-          A tool to keep track of drink consumption in the_office
+        <p className="text-gray-400 text-lg">
+          Monitor Your Drink Intake Effortlessly
         </p>
         <div className="flex flex-col gap-2">
           <LoginButton>
@@ -35,11 +35,6 @@ export default function Home() {
               Login
             </Button>
           </LoginButton>
-          {/* <LoginButton>
-            <Button variant="link" className="text-gray-400" size="lg">
-              Already have an account?
-            </Button>
-          </LoginButton> */}
         </div>
       </div>
     </main>

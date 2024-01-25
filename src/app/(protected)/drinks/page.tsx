@@ -65,7 +65,7 @@ const DrinksPage = async () => {
         greeting={greeting}
         subtitle={subtitle}
       />
-      <div className="w-full flex flex-col gap-2">
+      <div className="w-full flex flex-col gap-2 p-2">
         {drinks &&
           drinks.map((drink) => {
             return (

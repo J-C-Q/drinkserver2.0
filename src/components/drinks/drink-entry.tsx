@@ -70,7 +70,7 @@ export const DrinkEntry = ({
       <DrawerTrigger asChild>
         <div
           className={
-            "w-full text-white flex flex-row justify-end items-center relative cursor-pointer rounded-xl " +
+            " text-white flex flex-row justify-end items-center relative cursor-pointer rounded-xl " +
             `bg-${bgcolor}`
           }
         >
@@ -84,7 +84,8 @@ export const DrinkEntry = ({
             ></Image>
           )}
           <span className={"z-10 absolute top-50 left-12 " + `text-${color}`}>
-            <span className="font-semibold text-3xl">{quantity}</span> in stock
+            <span className="font-semibold text-2xl">{quantity}</span>{" "}
+            <span className="text-sm">in stock</span>
           </span>
           {/* <span className={"z-10 absolute top-0 right-0 " + `text-${color}`}>
             {drinkprice}€
