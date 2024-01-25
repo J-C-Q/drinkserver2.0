@@ -8,6 +8,11 @@ import { Navigator } from "@/components/drinks/navigation";
 const DrinksPage = async () => {
   const session = await auth();
   const drinks = await getItems();
+  if (drinks) {
+    drinks.sort((a, b) => {
+      return a.itemname.localeCompare(b.itemname);
+    });
+  }
 
   const getRandomElement = (array: string[]) => {
     return array[Math.floor(Math.random() * array.length)];
@@ -54,13 +59,13 @@ const DrinksPage = async () => {
   ];
 
   return (
-    <main>
+    <main className="min-h-screen">
       <Navigator
         username={session?.user.name}
         greeting={greeting}
         subtitle={subtitle}
       />
-      <div className="w-screen">
+      <div className="w-full flex flex-col gap-2">
         {drinks &&
           drinks.map((drink) => {
             return (
@@ -72,6 +77,7 @@ const DrinksPage = async () => {
                   drinkquantity={drink.quantity}
                   selectedQuote={getRandomElement(possibleQuotes)}
                   bgimage={drink.image ? drink.image : undefined}
+                  bgcolor={drink.bgcolor ? drink.bgcolor : undefined}
                   color={drink.color ? drink.color : undefined}
                   key={drink.itemid}
                 />

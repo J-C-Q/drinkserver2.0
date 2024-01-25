@@ -26,6 +26,7 @@ interface DrinkEntryProps {
   drinkquantity: number;
   selectedQuote?: string;
   bgimage?: string;
+  bgcolor?: string;
   color?: string;
 }
 export const DrinkEntry = ({
@@ -35,6 +36,7 @@ export const DrinkEntry = ({
   drinkquantity,
   selectedQuote,
   bgimage,
+  bgcolor,
   color,
 }: DrinkEntryProps) => {
   const session = useSession();
@@ -54,41 +56,63 @@ export const DrinkEntry = ({
       });
   };
 
-  const possibleColors = ["text-white", "text-black"];
+  const possibleColors = [
+    "text-white",
+    "text-black",
+    "bg-rot",
+    "bg-gelb",
+    "bg-braun",
+    "bg-schwarz",
+    "bg-weiss",
+  ];
   return (
     <Drawer>
       <DrawerTrigger asChild>
-        <div className="w-full text-white flex flex-row justify-end text-2xl items-center relative hover:border-2">
+        <div
+          className={
+            "w-full text-white flex flex-row justify-end items-center relative cursor-pointer rounded-xl " +
+            `bg-${bgcolor}`
+          }
+        >
           {bgimage && (
             <Image
               src={bgimage}
               alt="background image"
               height={200}
               width={600}
-              className="object-cover object-right -z-0"
+              className="-z-0 rounded-xl"
             ></Image>
           )}
-          <span className={"z-10 absolute top-50 left-10 " + `text-${color}`}>
-            {quantity}left
+          <span className={"z-10 absolute top-50 left-12 " + `text-${color}`}>
+            <span className="font-semibold text-3xl">{quantity}</span> in stock
           </span>
           {/* <span className={"z-10 absolute top-0 right-0 " + `text-${color}`}>
             {drinkprice}€
           </span> */}
         </div>
       </DrawerTrigger>
-      <DrawerContent className="h-[50vh] border-none hover:border-none">
+      <DrawerContent
+        className={"h-[50vh] border-none outline-none " + `bg-${bgcolor}`}
+      >
         <DrawerHeader>
-          <DrawerTitle>{drinkname}</DrawerTitle>
-          <DrawerDescription>
+          <DrawerTitle className={"text-4xl sm:text-6xl " + `text-${color}`}>
+            {drinkname}
+          </DrawerTitle>
+          <DrawerDescription
+            className={"text-md sm:text-2xl " + `text-${color}`}
+          >
             {selectedQuote != undefined ? selectedQuote : ""}
-            <br></br>
-            Are you sure you want to buy {drinkname} for {drinkprice}€? There
-            are currently {quantity} left.
           </DrawerDescription>
         </DrawerHeader>
-        <DrawerFooter>
+        <DrawerFooter className={"text-md sm:text-xl " + `text-${color}`}>
+          <p>
+            Are you sure you want to buy {drinkname} for{" "}
+            <span className="font-semibold">{drinkprice.toFixed(2)}€</span>?
+          </p>
           <DrawerClose>
             <Button
+              className="w-[80%] h-12 bg-transparent"
+              variant="outline"
               onClick={() => {
                 if (userid) {
                   const promise = () => order(drinkid, userid);
@@ -107,11 +131,11 @@ export const DrinkEntry = ({
                     error: "Error",
                   });
                 } else {
-                  console.log("userid not found... this is bad");
+                  toast.error("Userid not found, please reload the page");
                 }
               }}
             >
-              Buy
+              <span className="text-xl font-semibold">Buy</span>
             </Button>
           </DrawerClose>
         </DrawerFooter>
