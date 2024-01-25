@@ -2,7 +2,7 @@ import { auth, signOut } from "@/auth";
 import { getItems } from "@/data/item";
 import { DrinkEntry } from "@/components/drinks/drink-entry";
 import { SessionProvider } from "next-auth/react";
-
+import { Toaster } from "@/components/ui/sonner";
 const DrinksPage = async () => {
   const session = await auth();
   const drinks = await getItems();
@@ -22,6 +22,7 @@ const DrinksPage = async () => {
             </SessionProvider>
           );
         })}
+      <Toaster richColors />
     </div>
   );
 };

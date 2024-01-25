@@ -95,7 +95,6 @@ export const DrinkEntry = ({
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
-      <Toaster richColors />
     </>
   );
 };
