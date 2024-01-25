@@ -1,3 +1,4 @@
+"use client";
 import { logout } from "@/actions/logout";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
