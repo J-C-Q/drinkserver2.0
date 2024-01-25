@@ -27,7 +27,7 @@ export const order = async (itemid:string,userid:string) => {
         data: {
             itemid,
             userId: userid,
-            username: existingUser.name,
+            username: existingUser.name!=null?existingUser.name:"",
             itemname: existingItem.itemname,
             itemprice: existingItem.itemprice,
             date: new Date(),
