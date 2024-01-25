@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { NextResponse } from 'next/server';
-import {Order} from "@/actions/order";
+import {order} from "@/actions/order";
  
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -14,14 +14,14 @@ export async function GET(request: Request) {
   }
 
   if(session.user.id !== userid) {
-    return NextResponse.json({error: "Not logged in!"});
+    return NextResponse.json({error: "Not logged in as this user!"});
   }
 
   if(!itemid || !userid) {
     return NextResponse.json({error: "Missing parameters!"});
   }
 
-    const result = await Order(itemid,userid);
+    const result = await order(itemid,userid);
 
   return NextResponse.json(result);
     // const result = await Order(itemid,userid);

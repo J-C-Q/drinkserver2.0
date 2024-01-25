@@ -3,24 +3,31 @@
 import {db} from "@/lib/db";
 
 import {getItemById} from "@/data/item";
+import { getUserById } from "@/data/user";
 
 
-export const Order = async (itemid:string,userid:string) => {
+export const order = async (itemid:string,userid:string) => {
     
     const existingItem = await getItemById(itemid);
+    const existingUser = await getUserById(userid);
+
+    if(!existingUser) {
+        return {error: "User not found!"};
+    }
 
     if(!existingItem) {
         return {error: "Item not found!"};
     }
 
     if(existingItem.quantity < 1) {
-        return {error: "Item out of stock!"};
+        return {error: `${existingItem.itemname} is out of stock!`};
     }
 
     await db.order.create({
         data: {
             itemid,
             userId: userid,
+            username: existingUser.name,
             itemname: existingItem.itemname,
             itemprice: existingItem.itemprice,
             date: new Date(),
@@ -33,5 +40,5 @@ export const Order = async (itemid:string,userid:string) => {
         data: {quantity: existingItem.quantity - 1}
     });
 
-    return {success: "Order placed!"};
+    return {success: `${existingUser.name} ordered ${existingItem.itemname}!`};
 };

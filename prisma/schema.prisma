@@ -74,6 +74,7 @@ model PasswordResetToken {
 model Order {
     orderId   String      @id @default(cuid())
     userId    String
+    username  String
     itemid    String
     itemname  String
     itemprice Float
@@ -83,7 +84,7 @@ model Order {
 
 model Item {
     itemid       String  @id @default(cuid())
-    itemname     String
+    itemname     String  @unique
     itemprice    Float
     quantity     Int
     energy       Float?
