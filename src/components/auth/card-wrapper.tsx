@@ -55,7 +55,10 @@ export const CardWrapper = ({
             <div className="relative px-5">
               <Separator />
               <span className="absolute top-[100%] left-[50%] text-center -translate-x-2/4 -translate-y-2/4 bg-white px-2 text-sm text-muted-foreground text-nowrap flex flex-row items-center h-fit">
-                <FaAngleDown /> <span className="p-1">{collapsibleLabel}</span>{" "}
+                <FaAngleDown />{" "}
+                <span className="p-1 whitespace-nowrap">
+                  {collapsibleLabel}
+                </span>{" "}
                 <FaAngleDown />
               </span>
             </div>

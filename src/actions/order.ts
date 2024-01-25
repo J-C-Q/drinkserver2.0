@@ -15,6 +15,10 @@ export const order = async (itemid:string,userid:string) => {
         return {error: "User not found!"};
     }
 
+    if(existingUser.authorized != true) {
+        return {error: "Your are not authorized yet, please contact the admin"};
+    }
+
     if(!existingItem) {
         return {error: "Item not found!"};
     }

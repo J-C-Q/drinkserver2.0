@@ -45,7 +45,7 @@ export const Receipt = ({ username, userid, orders }: ReceiptProps) => {
     <>
       <div
         className={cn(
-          "max-w-[350px] min-h-9 mx-auto flex flex-col items-center p-5 pt-10 relative  bg-white",
+          "max-w-[350px] min-h-9 mx-auto flex flex-col items-center p-5 pt-10 relative  bg-white mb-7",
           font.className
         )}
       >
@@ -84,12 +84,12 @@ export const Receipt = ({ username, userid, orders }: ReceiptProps) => {
               })}
             </span>
           </p>
-          <Table className="">
-            <TableHeader className="hover:bg-white border-b-2 border-none">
+          <Table className="w-full">
+            <TableHeader className="hover:bg-white border-b-2 border-none w-full">
               <TableRow className="hover:bg-white border-none">
-                <TableHead>QTY</TableHead>
-                <TableHead>ITEM</TableHead>
-                <TableHead>AMT</TableHead>
+                <TableHead className="w-[100px]">QTY</TableHead>
+                <TableHead className="w-full">ITEM</TableHead>
+                <TableHead className="w-full">AMT</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody className="text-black gap-0">

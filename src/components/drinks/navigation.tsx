@@ -1,6 +1,7 @@
 "use client";
 import { logout } from "@/actions/logout";
 import { Button } from "@/components/ui/button";
+import { IoLogOutSharp } from "react-icons/io5";
 import Link from "next/link";
 
 interface NavigatorProps {
@@ -18,6 +19,9 @@ export const Navigator = ({
   link,
   children,
 }: NavigatorProps) => {
+  const onClick = () => {
+    logout();
+  };
   return (
     <nav className="my-5 w-[80vw] mx-auto h-20 bg-secondary text-secondary-foreground shadow-sm rounded-md flex items-center justify-between px-5">
       <div className="">
@@ -31,12 +35,21 @@ export const Navigator = ({
         <p className="text-sm">{subtitle}</p>
       </div>
 
-      <Button
-        className=" w-fit h-fit p-2 hover:bg-secondary-foreground hover:text-secondary"
-        variant={"secondary"}
-      >
-        <Link href={link}>{children}</Link>
-      </Button>
+      <div className="flex flex-row gap-2">
+        <Button
+          className=" w-fit h-fit p-2 hover:bg-secondary-foreground hover:text-secondary"
+          variant={"secondary"}
+        >
+          <Link href={link}>{children}</Link>
+        </Button>
+        <Button
+          className=" w-fit h-fit p-2 hover:bg-secondary-foreground hover:text-secondary"
+          variant={"secondary"}
+          onClick={onClick}
+        >
+          <IoLogOutSharp className="h-5 w-5" />
+        </Button>
+      </div>
     </nav>
   );
 };
