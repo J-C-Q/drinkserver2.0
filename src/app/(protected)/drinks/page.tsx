@@ -4,7 +4,7 @@ import { DrinkEntry } from "@/components/drinks/drink-entry";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "@/components/ui/sonner";
 import { Navigator } from "@/components/drinks/navigation";
-
+import { MdSpaceDashboard } from "react-icons/md";
 const DrinksPage = async () => {
   const session = await auth();
   const drinks = await getItems();
@@ -55,7 +55,7 @@ const DrinksPage = async () => {
     "Superb choice!",
     "Brilliant choice!",
     "Fantastic choice!",
-    "Excellent choicee!",
+    "Excellent choice!",
   ];
 
   return (
@@ -64,7 +64,10 @@ const DrinksPage = async () => {
         username={session?.user.name}
         greeting={greeting}
         subtitle={subtitle}
-      />
+        link={"/dashboard"}
+      >
+        <MdSpaceDashboard className="w-5 h-5" />
+      </Navigator>
       <div className="w-full flex flex-col gap-2 p-2">
         {drinks &&
           drinks.map((drink) => {

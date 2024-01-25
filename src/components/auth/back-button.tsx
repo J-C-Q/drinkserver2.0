@@ -1,4 +1,4 @@
-"use client";
+"use server";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
