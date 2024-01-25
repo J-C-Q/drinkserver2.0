@@ -9,6 +9,9 @@ import { getPendingOrdersForUser } from "@/data/order";
 import { TbBottle } from "react-icons/tb";
 import { Receipt } from "@/components/drinks/receipt";
 
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { PayButton } from "@/components/paypal/pay-button";
+
 const DashboardPage = async () => {
   const session = await auth();
   const orders = await getPendingOrdersForUser(session?.user.id);
@@ -28,6 +31,7 @@ const DashboardPage = async () => {
         userid={session?.user.id}
         orders={orders}
       />
+      <PayButton />
       <OrderTable orders={orders} />
     </main>
   );
