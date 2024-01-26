@@ -11,7 +11,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Toaster } from "@/components/ui/sonner";
+
 import { toast } from "sonner";
 
 import { order } from "@/actions/order";
@@ -65,12 +65,13 @@ export const DrinkEntry = ({
     "bg-schwarz",
     "bg-weiss",
   ];
+
   return (
     <Drawer>
       <DrawerTrigger asChild>
         <div
           className={
-            " text-white flex flex-row justify-end items-center relative cursor-pointer rounded-xl " +
+            " text-white flex flex-row justify-end items-center relative active:scale-95 transition-scale duration-200 cursor-pointer rounded-xl " +
             `bg-${bgcolor}`
           }
         >
@@ -105,10 +106,10 @@ export const DrinkEntry = ({
             {selectedQuote != undefined ? selectedQuote : ""}
           </DrawerDescription>
         </DrawerHeader>
-        <DrawerFooter className={"text-md sm:text-xl " + `text-${color}`}>
-          <p>
-            Are you sure you want to buy {drinkname} for{" "}
-            <span className="font-semibold">{drinkprice.toFixed(2)}€</span>?
+        <DrawerFooter className={"text-md sm:text-xl  " + `text-${color}`}>
+          <p className="whitespace-nowrap text-center w-full">
+            Buy for
+            <span className="font-semibold"> {drinkprice.toFixed(2)}€</span>?
           </p>
           <DrawerClose>
             <Button

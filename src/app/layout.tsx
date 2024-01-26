@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Drink Server 2.0",
   description: "Monitor Your Drink Intake Effortlessly",
   manifest: "/manifest.json",
+  themeColor: "#1E2835",
 };
 
 export default function RootLayout({

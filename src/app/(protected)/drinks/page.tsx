@@ -42,6 +42,11 @@ const DrinksPage = async () => {
     "Need a refreshment?",
     "What would you like?",
     "Desire a particular drink?",
+    "What's your beverage?",
+    "What's your favorite drink?",
+    "What's your favorite beverage?",
+    "Take your pick!",
+    "Select your drink!",
   ];
   const subtitle = getRandomElement(possibleSubtitles);
 
@@ -56,8 +61,27 @@ const DrinksPage = async () => {
     "Brilliant choice!",
     "Fantastic choice!",
     "Excellent choice!",
+    "Splendid choice!",
+    "Incredible choice!",
+    "Unbelievable choice!",
+    "Unreal choice!",
+    "Unimaginable choice!",
+    "Quite the choice!",
+    "What a choice!",
+    "Are you sure?",
+    "Are you certain?",
+    "If you say so!",
+    "Be sure!",
+    "Questionable choice!",
+    "Really?",
+    "Seriously?",
+    "You sure?",
+    "You certain?",
+    "You sure about that?",
   ];
 
+  // do async stuff for 30 seconds
+  //   await new Promise((resolve) => setTimeout(resolve, 10000));
   return (
     <main className="min-h-screen">
       <Navigator
@@ -94,6 +118,3 @@ const DrinksPage = async () => {
 };
 
 export default DrinksPage;
-
-// froce dynamic
-export const dynamic = "force-dynamic";

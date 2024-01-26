@@ -12,7 +12,8 @@ import { Receipt } from "@/components/drinks/receipt";
 const DashboardPage = async () => {
   const session = await auth();
   const orders = await getPendingOrdersForUser(session?.user.id);
-
+  // do async stuff for 30 seconds
+  //   await new Promise((resolve) => setTimeout(resolve, 10000));
   return (
     <main className="min-h-screen">
       <Navigator
