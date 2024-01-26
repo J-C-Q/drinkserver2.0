@@ -12,6 +12,7 @@ import {
   TableRow,
   TableFooter,
 } from "@/components/ui/table";
+import { PayButton } from "../paypal/pay-button";
 
 interface ReceiptProps {
   username: string | undefined | null;
@@ -42,7 +43,7 @@ export const Receipt = ({ username, userid, orders }: ReceiptProps) => {
     return acc;
   }, 0);
   return (
-    <>
+    <div className="w-full flex flex-col items-center mb-10">
       <div
         className={cn(
           "max-w-[350px] min-h-9 mx-auto flex flex-col items-center p-5 pt-10 relative  bg-white mb-7",
@@ -74,6 +75,7 @@ export const Receipt = ({ username, userid, orders }: ReceiptProps) => {
                 year: "numeric",
                 month: "numeric",
                 day: "numeric",
+                timeZone: "Europe/Berlin",
               })}
             </span>
             <span>
@@ -81,6 +83,7 @@ export const Receipt = ({ username, userid, orders }: ReceiptProps) => {
                 hour: "2-digit",
                 minute: "2-digit",
                 second: "2-digit",
+                timeZone: "Europe/Berlin",
               })}
             </span>
           </p>
@@ -118,6 +121,14 @@ export const Receipt = ({ username, userid, orders }: ReceiptProps) => {
           <h1 className="font-semibold text-lg">{total.toFixed(2)}</h1>
         </div>
       </div>
-    </>
+      <PayButton
+        label={"Paypal.me"}
+        href={
+          "https://paypal.me/officeDrinks/" +
+          total.toFixed(2) +
+          "EUR?country.x=DE&locale.x=de_DE/"
+        }
+      />
+    </div>
   );
 };

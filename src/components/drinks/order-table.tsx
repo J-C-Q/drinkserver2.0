@@ -17,7 +17,7 @@ interface OrderTableProps {
 export const OrderTable = ({ orders }: OrderTableProps) => {
   return (
     <Table>
-      <TableCaption>A list of your unpayerd orders.</TableCaption>
+      <TableCaption>A list of your unpaid orders.</TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead>Date</TableHead>
@@ -31,14 +31,20 @@ export const OrderTable = ({ orders }: OrderTableProps) => {
           orders.map((order) => (
             <TableRow key={order.orderId}>
               <TableCell className="font-medium">
-                {order.date.getDate() +
-                  "." +
-                  (order.date.getMonth() + 1) +
-                  "." +
-                  order.date.getFullYear()}
+                {order.date.toLocaleString("de-DE", {
+                  year: "numeric",
+                  month: "numeric",
+                  day: "numeric",
+                  timeZone: "Europe/Berlin",
+                })}
               </TableCell>
               <TableCell className="font-medium">
-                {order.date.getHours() + ":" + order.date.getMinutes()}
+                {order.date.toLocaleString("de-DE", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                  timeZone: "Europe/Berlin",
+                })}
               </TableCell>
               <TableCell>{order.itemname}</TableCell>
               <TableCell>{order.itemprice.toFixed(2)}</TableCell>

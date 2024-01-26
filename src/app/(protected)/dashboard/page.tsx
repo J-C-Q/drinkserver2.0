@@ -23,6 +23,7 @@ const DashboardPage = async () => {
       >
         <TbBottle className="h-5 w-5" />
       </Navigator>
+
       <Receipt
         username={session?.user.name}
         userid={session?.user.id}

@@ -8,3 +8,12 @@ export const getPendingOrdersForUser = async (userid: string | undefined) => {
         return null
     }
 }
+
+export const verifyPendingOrdersForUser = async (userid: string | undefined) => {
+    try {
+        await db.order.updateMany({ where: { userId: userid, status: "PENDING"}, data: { status: "COMPLETED" } });
+        return true;
+    } catch {
+        return false
+    }
+}

@@ -40,14 +40,16 @@ export const Navigator = ({
           className=" w-fit h-fit p-2 hover:bg-secondary-foreground hover:text-secondary"
           variant={"secondary"}
         >
-          <Link href={link}>{children}</Link>
+          <Link href={link} className="hover:scale-110">
+            {children}
+          </Link>
         </Button>
         <Button
           className=" w-fit h-fit p-2 hover:bg-secondary-foreground hover:text-secondary"
           variant={"secondary"}
           onClick={onClick}
         >
-          <IoLogOutSharp className="h-5 w-5" />
+          <IoLogOutSharp className="h-5 w-5 hover:scale-110" />
         </Button>
       </div>
     </nav>
