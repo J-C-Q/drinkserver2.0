@@ -35,3 +35,6 @@ const DashboardPage = async () => {
 };
 
 export default DashboardPage;
+
+// froce dynamic
+export const dynamic = "force-dynamic";

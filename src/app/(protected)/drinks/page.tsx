@@ -94,3 +94,6 @@ const DrinksPage = async () => {
 };
 
 export default DrinksPage;
+
+// froce dynamic
+export const dynamic = "force-dynamic";
