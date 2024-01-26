@@ -26,7 +26,7 @@ export default function Home() {
           </span>
           <BsStars className="absolute right-0 sm:-right-12 -top-10 text-amber-400" />
         </h1>
-        {/* <p className="text-gray-400 text-lg">
+        <p className="text-gray-400 text-lg">
           Monitor Your Drink Intake Effortlessly
         </p>
         <div className="flex flex-col gap-2">
@@ -35,7 +35,7 @@ export default function Home() {
               Login
             </Button>
           </LoginButton>
-        </div> */}
+        </div>
       </div>
     </main>
   );
