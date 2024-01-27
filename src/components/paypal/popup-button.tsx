@@ -29,7 +29,7 @@ export const PopupButton = ({ total }: PopupButtonProps) => {
           <span className="ml-1">Paypal.me</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-800 to-black border-amber-200 rounded-lg">
+      <DialogContent className="bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-800 to-black border-amber-200 rounded-lg box-border mx-auto max-w-[90%]">
         <DialogHeader>
           <DialogTitle className="text-white mb-2">
             You will be redirected to{" "}
