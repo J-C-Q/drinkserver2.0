@@ -68,7 +68,7 @@ export const DrinkEntry = ({
 
   return (
     <Drawer>
-      <DrawerTrigger asChild>
+      <DrawerTrigger>
         <div
           className={
             " text-white flex flex-row justify-end items-center relative active:scale-95 transition-scale duration-200 cursor-pointer rounded-xl " +
@@ -82,6 +82,7 @@ export const DrinkEntry = ({
               height={200}
               width={600}
               className="-z-0 rounded-xl"
+              quality={100}
             ></Image>
           )}
           <span className={"z-10 absolute top-50 left-12 " + `text-${color}`}>

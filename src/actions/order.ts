@@ -12,19 +12,19 @@ export const order = async (itemid:string,userid:string) => {
     const existingUser = await getUserById(userid);
 
     if(!existingUser) {
-        return {error: "User not found!"};
+        return {error: "User not found!", code: 404};
     }
 
     if(existingUser.authorized != true) {
-        return {error: "Your are not authorized yet, please contact the admin"};
+        return {error: "Your are not authorized yet, please contact the admin", code: 403};
     }
 
     if(!existingItem) {
-        return {error: "Item not found!"};
+        return {error: "Item not found!", code: 404};
     }
 
     if(existingItem.quantity < 1) {
-        return {error: `${existingItem.itemname} is out of stock!`};
+        return {error: `${existingItem.itemname} is out of stock!`, code: 400};
     }
 
     await db.order.create({
@@ -44,5 +44,5 @@ export const order = async (itemid:string,userid:string) => {
         data: {quantity: existingItem.quantity - 1}
     });
 
-    return {success: `${existingUser.name} ordered ${existingItem.itemname}!`};
+    return {success: `${existingUser.name} ordered ${existingItem.itemname}!`, code: 200};
 };

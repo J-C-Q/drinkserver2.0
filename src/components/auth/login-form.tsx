@@ -22,7 +22,7 @@ import { login } from "@/actions/login";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import Link from "next/link";
-
+import { FadeLoader } from "react-spinners";
 export const LoginForm = () => {
   //   const searchParams = useSearchParams();
   //   let urlError = "";

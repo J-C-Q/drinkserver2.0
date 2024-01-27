@@ -10,18 +10,18 @@ export async function GET(request: Request) {
   const session = await auth();
 
   if (!session) {
-    return NextResponse.json({error: "Not logged in!"});
+    return NextResponse.json({error: "Not logged in!", code: 401});
   }
 
   if(!userid) {
-    return NextResponse.json({error: "Missing parameters!"});
+    return NextResponse.json({error: "Missing parameters!", code: 400});
   }
 
   if(session.user.role !== "ADMIN") {
-    return NextResponse.json({error: "You are not authorized to perform this action!"});
+    return NextResponse.json({error: "You are not authorized to perform this action!", code: 403});
   }
 
   const result = await verifyPendingOrdersForUser(userid);
 
-  return NextResponse.json(result);
+  return NextResponse.json({data: result,code: 200});
 }

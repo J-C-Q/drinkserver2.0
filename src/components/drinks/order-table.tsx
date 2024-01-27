@@ -16,9 +16,9 @@ interface OrderTableProps {
 
 export const OrderTable = ({ orders }: OrderTableProps) => {
   return (
-    <Table>
+    <Table className="w-full h-40 overflow-y-scroll">
       <TableCaption>A list of your unpaid orders.</TableCaption>
-      <TableHeader>
+      <TableHeader className="sticky top-0">
         <TableRow>
           <TableHead>Date</TableHead>
           <TableHead>Time</TableHead>

@@ -17,7 +17,7 @@ export const item = async (itemname:string,itemprice:number,quantity:number) => 
                 quantity
             }
         });
-        return {success: "Item added!"};
+        return {success: "Item added!", code: 200};
     }
 
     await db.item.update({
@@ -25,5 +25,5 @@ export const item = async (itemname:string,itemprice:number,quantity:number) => 
         data: {quantity, itemprice}
     });
 
-    return {success: "Item updated!"};
+    return {success: "Item updated!", code: 200};
 };

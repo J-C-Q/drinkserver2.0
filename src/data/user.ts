@@ -17,3 +17,12 @@ export const getUserById = async (id: string) => {
         return null
     }
 }
+
+export const authorizeUser = async (id: string) => {
+    try {
+        const user = await db.user.update({ where: { id }, data: { authorized: true } });
+        return user;
+    } catch {
+        return null
+    }
+}

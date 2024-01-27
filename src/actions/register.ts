@@ -8,14 +8,14 @@ import { RegisterSchema } from "@/schemas";
 import {getUserByEmail} from "@/data/user";
 import {generateVerificationToken} from "@/lib/tokens";
 import { sendVerificationEmail } from "@/lib/mail";
-import { send } from "process";
+
 
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
     console.log(values);
     const validatedFields = RegisterSchema.safeParse(values);
 
     if (!validatedFields.success) {
-        return {error: "Invalid fields!"};
+        return {error: "Invalid fields!", code: 400};
     }
     const {email,password,name} = validatedFields.data;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -24,7 +24,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     const existingUser = await getUserByEmail(email);
 
     if (existingUser) {
-        return {error: "Email already in use!"};
+        return {error: "Email already in use!", code: 400};
     }
 
     await db.user.create({
@@ -39,5 +39,5 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     await sendVerificationEmail(verificationToken.email, verificationToken.token);
 
 
-    return {success: "Confirmation email sent!"}
+    return {success: "Confirmation email sent!", code: 200}
 };

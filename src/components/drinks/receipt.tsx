@@ -43,7 +43,7 @@ export const Receipt = ({ username, userid, orders }: ReceiptProps) => {
     return acc;
   }, 0);
   return (
-    <div className="w-full flex flex-col items-center mb-10">
+    <div className="w-full flex flex-col items-center mb-10 mt-8">
       <div
         className={cn(
           "max-w-[350px] min-h-9 mx-auto flex flex-col items-center p-5 pt-10 relative  bg-white mb-7",
