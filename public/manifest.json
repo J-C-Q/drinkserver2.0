@@ -30,8 +30,8 @@
             "type": "image/png"
         },
         {
-            "src": "/icon-192x192.png",
-            "sizes": "196x196",
+            "src": "/drinkserverLogoMono.png",
+            "sizes": "1029x1029",
             "type": "image/png",
             "purpose": "maskable"
           }

@@ -10,7 +10,7 @@ export const PayButton = ({ href, label }: PayButtonProps) => {
   return (
     <Button
       variant="secondary"
-      className="font-normal mx-auto bg-amber-400 hover:bg-amber-300"
+      className="font-normal mx-auto bg-[linear-gradient(110deg,#fbbf24,45%,#fde68a,55%,#fbbf24)] bg-[length:200%_100%] animate-shimmer active:animate-shimmer transition-colors"
       size="sm"
       asChild
     >

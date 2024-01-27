@@ -1,3 +1,4 @@
+"use client";
 import { Poppins } from "next/font/google";
 
 import { cn } from "@/lib/utils";
@@ -16,11 +17,11 @@ export default function Home() {
       <div className="space-y-6 text-center mx-5">
         <h1
           className={cn(
-            "text-4xl sm:text-6xl font-semibold text-white drop-shadow-0 relative",
+            "text-4xl sm:text-6xl font-semibold text-white drop-shadow-0 relative ",
             font.className
           )}
         >
-          <span className="text-amber-400 relative">
+          <span className=" relative bg-[linear-gradient(110deg,#fbbf24,45%,#fde68a,55%,#fbbf24)] bg-[length:200%_100%] animate-shimmerslow transition-colors bg-clip-text text-transparent duration-700">
             Drink Server 2.0
             {/* <BsStars className="absolute -translate-x-14" /> */}
           </span>

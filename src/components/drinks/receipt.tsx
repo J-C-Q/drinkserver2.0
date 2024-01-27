@@ -12,8 +12,9 @@ import {
   TableRow,
   TableFooter,
 } from "@/components/ui/table";
-import { PayButton } from "../paypal/pay-button";
 
+import { PayButton } from "../paypal/pay-button";
+import { PopupButton } from "../paypal/popup-button";
 interface ReceiptProps {
   username: string | undefined | null;
   userid: string | undefined | null;
@@ -121,14 +122,7 @@ export const Receipt = ({ username, userid, orders }: ReceiptProps) => {
           <h1 className="font-semibold text-lg">{total.toFixed(2)}</h1>
         </div>
       </div>
-      <PayButton
-        label={"Paypal.me"}
-        href={
-          "https://paypal.me/officeDrinks/" +
-          total.toFixed(2) +
-          "EUR?country.x=DE&locale.x=de_DE/"
-        }
-      />
+      <PopupButton total={total} />
     </div>
   );
 };
