@@ -79,11 +79,13 @@ function addToBuckets(
   buckets: WeeklyBuckets
 ): void {
   orders.forEach((order) => {
-    const date = new Date(order.date);
+    const date = order.date;
     const day: WeekDays = date.toLocaleString("de-DE", {
       weekday: "long",
     }) as WeekDays;
-    const hour = date.getHours();
+    const hour = date.toLocaleTimeString("de-DE", {
+      hour: "numeric",
+    }) as unknown as number;
 
     buckets[day][hour]++;
   });
