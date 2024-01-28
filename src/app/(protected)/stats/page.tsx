@@ -82,11 +82,13 @@ function addToBuckets(
     const date = order.date;
     const day: WeekDays = date.toLocaleString("en-EN", {
       weekday: "long",
+      timeZone: "Europe/Berlin",
     }) as WeekDays;
     const hour = parseInt(
       date
         .toLocaleTimeString("de-DE", {
           hour: "numeric",
+          timeZone: "Europe/Berlin",
         })
         .slice(0, 3)
     ) as unknown as number;
