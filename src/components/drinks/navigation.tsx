@@ -15,6 +15,9 @@ import { HiMenuAlt3 } from "react-icons/hi";
 import { IoStatsChart } from "react-icons/io5";
 import { MdSpaceDashboard } from "react-icons/md";
 import { TbBottle } from "react-icons/tb";
+import { useState } from "react";
+import { set } from "zod";
+import { cn } from "@/lib/utils";
 interface NavigatorProps {
   username: string | undefined | null;
   greeting: string;
@@ -22,8 +25,10 @@ interface NavigatorProps {
 }
 
 export const Navigator = ({ username, greeting, subtitle }: NavigatorProps) => {
+  const [open, setOpen] = useState(false);
   const onClick = () => {
-    logout();
+    setOpen(!open);
+    console.log(open);
   };
   return (
     <nav className="my-5 w-[80vw] mx-auto h-20 bg-secondary text-secondary-foreground shadow-sm rounded-md flex items-center justify-between px-5">
@@ -39,14 +44,16 @@ export const Navigator = ({ username, greeting, subtitle }: NavigatorProps) => {
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger
+          className="border-none active:border-none focus:border-none group"
           asChild
-          className="border-none active:border-none focus:border-none"
         >
           <Button
-            className=" w-fit h-fit p-2 hover:bg-secondary-foreground hover:text-secondary"
+            className=" w-fit h-fit p-2  hover:text-secondary flex flex-col justify-center items-end gap-[3px]"
             variant={"secondary"}
           >
-            <HiMenuAlt3 className="h-5 w-5" />
+            <span className="bg-black rounded-full h-1 w-5 group-data-[state=open]:rotate-90 rotate-0 transition-rotate duration-100 group-data-[state=open]:translate-y-[3px]"></span>
+            <span className="bg-black rounded-full h-1 w-5 group-data-[state=open]:rotate-45 group-data-[state=open]:-translate-x-[7px] group-data-[state=open]:w-3 transition-all duration-100 group-data-[state=open]:translate-y-[3px]"></span>
+            <span className="bg-black rounded-full h-1 w-3 group-data-[state=open]:-rotate-45 group-data-[state=open]:-translate-x-[1px] group-data-[state=open]:-translate-y-[4px] transition-all opacity-100  group-data-[state=open]:opacity-100 duration-100"></span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
@@ -60,7 +67,7 @@ export const Navigator = ({ username, greeting, subtitle }: NavigatorProps) => {
             >
               <Link href="/drinks" className="hover:scale-110">
                 <TbBottle className="h-5 w-5" />
-                <span>Drinks</span>
+                <span className="ml-1">Drinks</span>
               </Link>
             </Button>
           </DropdownMenuItem>
@@ -72,7 +79,7 @@ export const Navigator = ({ username, greeting, subtitle }: NavigatorProps) => {
             >
               <Link href="/dashboard" className="hover:scale-110">
                 <MdSpaceDashboard className="w-5 h-5" />
-                <span>Dashboard</span>
+                <span className="ml-1">Dashboard</span>
               </Link>
             </Button>
           </DropdownMenuItem>
@@ -88,9 +95,10 @@ export const Navigator = ({ username, greeting, subtitle }: NavigatorProps) => {
               </Link>
             </Button>
           </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem>
             <Button
-              className=" w-full p-2 hover:bg-secondary-foreground hover:text-secondary"
+              className=" w-full p-2 hover:bg-secondary-foreground hover:text-secondary bg-destructive"
               variant={"secondary"}
               onClick={onClick}
             >

@@ -65,6 +65,8 @@ export const DrinkEntry = ({
     "bg-braun",
     "bg-schwarz",
     "bg-weiss",
+    "text-white/10",
+    "text-black/10",
   ];
 
   const router = useRouter();
@@ -110,11 +112,21 @@ export const DrinkEntry = ({
             {selectedQuote != undefined ? selectedQuote : ""}
           </DrawerDescription>
         </DrawerHeader>
-        <DrawerFooter className={"text-md sm:text-xl  " + `text-${color}`}>
+        <DrawerFooter
+          className={"text-md relative sm:text-xl  " + `text-${color}`}
+        >
           <p className="whitespace-nowrap text-center w-full">
             Buy for
             <span className="font-semibold"> {drinkprice.toFixed(2)}€</span>?
           </p>
+          <span
+            className={
+              "absolute top-0 -translate-y-[60%] -translate-x-[50%] [writing-mode:vertical-lr] " +
+              `text-${color}/10`
+            }
+          >
+            {drinkid}
+          </span>
           <DrawerClose>
             <Button
               className="w-[80%] h-12 bg-transparent"

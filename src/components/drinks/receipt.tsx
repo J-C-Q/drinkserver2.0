@@ -103,13 +103,13 @@ export const Receipt = ({ username, userid, orders }: ReceiptProps) => {
                     key={order[0]}
                     className="border-none p-0 hover:bg-white"
                   >
-                    <TableCell className="font-medium py-0">
+                    <TableCell className="font-medium py-0 text-right">
                       {order[1][0]}
                     </TableCell>
                     <TableCell className="font-medium py-0">
                       {order[0]}
                     </TableCell>
-                    <TableCell className="font-medium py-0">
+                    <TableCell className="font-medium py-0 text-right">
                       {order[1][1].toFixed(2)}
                     </TableCell>
                   </TableRow>

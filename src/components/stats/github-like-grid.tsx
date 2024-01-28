@@ -67,7 +67,7 @@ export const GithubLike = ({ data }: GithubLikeProps) => {
               {Object.keys(data[day as WeekDays]).map((hour) => (
                 <div
                   key={hour}
-                  className={`row-span-1 col-span-1 bg-gray-800/75 sm:rounded-md rounded-md aspect-square w-full relative`}
+                  className={`row-span-1 col-span-1 bg-gray-800/75 sm:rounded-md rounded-md  aspect-square w-full relative`}
                 >
                   {day === "Saturday" && parseInt(hour) % 2 == 0 && (
                     <span

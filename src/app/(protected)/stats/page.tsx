@@ -40,7 +40,7 @@ const StatsPage = async () => {
       <Navigator
         username={session?.user.name}
         greeting={"Stats for "}
-        subtitle={"Impress your friends"}
+        subtitle={"Understand your patterns"}
       ></Navigator>
       <GithubLike data={buckets} />
     </main>
