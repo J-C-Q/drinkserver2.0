@@ -28,7 +28,10 @@ const font = Roboto_Mono({
 
 export const GithubLike = ({ data }: GithubLikeProps) => {
   const maxValue = Math.max(
-    ...Object.values(data).map((day) => Math.max(...Object.values(day)))
+    Math.max(
+      ...Object.values(data).map((day) => Math.max(...Object.values(day)))
+    ),
+    5
   );
   const possibleOpacity = [
     "opacity-[0.0]",
@@ -95,7 +98,7 @@ export const GithubLike = ({ data }: GithubLikeProps) => {
             </div>
           ))}
         <span className="w-full text-center absolute bottom-[-2%] translate-y-[100%] text-gray-600 group-active:opacity-0 group-hover:opacity-0 opacity-100 transition-opacity duration-200">
-          You drink heatmap
+          Your drink heatmap
         </span>
       </div>
     </div>
