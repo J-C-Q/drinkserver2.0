@@ -80,7 +80,7 @@ function addToBuckets(
 ): void {
   orders.forEach((order) => {
     const date = new Date(order.date);
-    const day: WeekDays = date.toLocaleString("en-US", {
+    const day: WeekDays = date.toLocaleString("de-DE", {
       weekday: "long",
     }) as WeekDays;
     const hour = date.getHours();
