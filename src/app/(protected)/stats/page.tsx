@@ -83,10 +83,14 @@ function addToBuckets(
     const day: WeekDays = date.toLocaleString("en-EN", {
       weekday: "long",
     }) as WeekDays;
-    const hour = date.toLocaleTimeString("de-DE", {
-      hour: "numeric",
-    }) as unknown as number;
-
+    const hour = parseInt(
+      date
+        .toLocaleTimeString("de-DE", {
+          hour: "numeric",
+        })
+        .slice(0, 3)
+    ) as unknown as number;
+    console.log(hour);
     buckets[day][hour]++;
   });
 }
