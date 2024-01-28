@@ -44,18 +44,18 @@ export const DrinkEntry = ({
   const userid = session.data?.user.id;
   const [quantity, setQuantity] = useState(drinkquantity);
 
-  const fetchquantity = async () => {
-    await fetchItemQuantity(drinkid)
-      .then((response) => {
-        setQuantity(
-          response.quantity != undefined ? response.quantity : drinkquantity
-        );
-      })
-      .catch((error) => {
-        console.log(error);
-        toast.error("Error fetching quantity, please reload the page");
-      });
-  };
+  //   const fetchquantity = async () => {
+  //     await fetchItemQuantity(drinkid)
+  //       .then((response) => {
+  //         setQuantity(
+  //           response.quantity != undefined ? response.quantity : drinkquantity
+  //         );
+  //       })
+  //       .catch((error) => {
+  //         console.log(error);
+  //         toast.error("Error fetching quantity, please reload the page");
+  //       });
+  //   };
 
   const possibleColors = [
     "text-white",
@@ -90,13 +90,14 @@ export const DrinkEntry = ({
               quality={100}
             ></Image>
           )}
-          <span className={"z-10 absolute top-50 left-12 " + `text-${color}`}>
-            <span className="font-semibold text-2xl">{quantity}</span>{" "}
+          <span
+            className={
+              "z-10 absolute top-50 left-7  rounded-lg px-2 " + `text-${color}`
+            }
+          >
+            <span className="font-semibold text-2xl">{quantity + " "}</span>
             <span className="text-sm">in stock</span>
           </span>
-          {/* <span className={"z-10 absolute top-0 right-0 " + `text-${color}`}>
-            {drinkprice}€
-          </span> */}
         </div>
       </DrawerTrigger>
       <DrawerContent
@@ -115,10 +116,10 @@ export const DrinkEntry = ({
         <DrawerFooter
           className={"text-md relative sm:text-xl  " + `text-${color}`}
         >
-          <p className="whitespace-nowrap text-center w-full">
+          {/* <p className="whitespace-nowrap text-center w-full">
             Buy for
             <span className="font-semibold"> {drinkprice.toFixed(2)}€</span>?
-          </p>
+          </p> */}
           <span
             className={
               "absolute top-0 -translate-y-[60%] -translate-x-[50%] [writing-mode:vertical-lr] " +
@@ -139,11 +140,13 @@ export const DrinkEntry = ({
                     success: (data) => {
                       if (data.success != undefined && data.success != "") {
                         toast.success(data.success);
+                        setQuantity(quantity - 1);
                       }
                       if (data.error != undefined && data.error != "") {
                         toast.error(data.error);
                       }
                       //   fetchquantity();
+
                       return "Order processed!";
                     },
                     error: "Error",
@@ -153,7 +156,10 @@ export const DrinkEntry = ({
                 }
               }}
             >
-              <span className="text-xl font-semibold">Buy</span>
+              <span className="text-xl font-semibold">
+                Buy for
+                <span className="font-semibold"> {drinkprice.toFixed(2)}€</span>
+              </span>
             </Button>
           </DrawerClose>
         </DrawerFooter>

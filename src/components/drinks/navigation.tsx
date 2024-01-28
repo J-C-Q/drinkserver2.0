@@ -57,8 +57,8 @@ export const Navigator = ({ username, greeting, subtitle }: NavigatorProps) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuLabel>Navigation</DropdownMenuLabel>
-          <DropdownMenuSeparator />
+          {/* <DropdownMenuLabel>Navigation</DropdownMenuLabel>
+          <DropdownMenuSeparator /> */}
           <DropdownMenuItem>
             <Button
               className="w-full p-2 hover:bg-secondary-foreground hover:text-secondary"

@@ -72,7 +72,7 @@ export const GithubLike = ({ data }: GithubLikeProps) => {
                   {day === "Saturday" && parseInt(hour) % 2 == 0 && (
                     <span
                       className={cn(
-                        "absolute bottom-[-30px] sm:bottom-[-50px] sm:left[-10px] left-[-16px] justify-center items-center rotate-90 max-w-10 max-h-5 text-[10px] flex group-active:opacity-100 group-hover:opacity-100 opacity-0 transition-opacity duration-200 sm:text-sm " +
+                        "absolute bottom-[-50%] translate-y-[100%] left-[0%] translate-x-[-50%] justify-center items-center [writing-mode:vertical-rl] text-[10px] flex group-active:opacity-100 group-hover:opacity-100 opacity-0 transition-opacity duration-200 sm:text-sm " +
                           font.className
                       )}
                     >
