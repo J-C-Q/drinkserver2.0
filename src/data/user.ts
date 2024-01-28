@@ -26,3 +26,12 @@ export const authorizeUser = async (id: string) => {
         return null
     }
 }
+
+export const unAuthorizeUser = async (id: string) => {
+    try {
+        const user = await db.user.update({ where: { id }, data: { authorized: false } });
+        return user;
+    } catch {
+        return null
+    }
+}

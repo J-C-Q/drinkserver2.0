@@ -13,10 +13,7 @@ export const LoadingNavigator = () => {
         <Skeleton className="w-32 h-6 rounded-full mb-2 bg-gray-200" />
         <Skeleton className="w-24 h-4 rounded-full bg-gray-200" />
       </div>
-      <div className="flex flex-row gap-2">
-        <Skeleton className="w-8 h-8 rounded-md bg-gray-200" />
-        <Skeleton className="w-8 h-8 rounded-md bg-gray-200" />
-      </div>
+      <Skeleton className="w-8 h-8 rounded-md bg-gray-200" />
     </nav>
   );
 };

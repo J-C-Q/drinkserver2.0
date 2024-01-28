@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { Navigator } from "@/components/drinks/navigation";
 import { OrderTable } from "@/components/drinks/order-table";
 import { getPendingOrdersForUser } from "@/data/order";
-import { TbBottle } from "react-icons/tb";
+
 import { Receipt } from "@/components/drinks/receipt";
 
 const DashboardPage = async () => {
@@ -20,10 +20,7 @@ const DashboardPage = async () => {
         username={session?.user.name}
         greeting={"Dashboard for "}
         subtitle={"Manage your orders"}
-        link={"/drinks"}
-      >
-        <TbBottle className="h-5 w-5" />
-      </Navigator>
+      ></Navigator>
 
       <Receipt
         username={session?.user.name}

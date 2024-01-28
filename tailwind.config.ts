@@ -74,10 +74,13 @@ const config = {
           to: { height: "0" },
         },
         shimmer: {
-            from: {
+            '0%': {
               "backgroundPosition": "0 0"
             },
-            to: {
+            '10%': {
+                "backgroundPosition": "-200% 0"
+            },
+            '100%': {
               "backgroundPosition": "-200% 0"
             }
           }
@@ -85,7 +88,7 @@ const config = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        shimmer: "shimmer 0.5s linear",
+        shimmer: "shimmer 6s linear infinite",
         shimmerslow: "shimmer 12s linear"
       }
     },

@@ -17,3 +17,12 @@ export const verifyPendingOrdersForUser = async (userid: string | undefined) => 
         return false
     }
 }
+
+export const getOrdersForUser = async (userId: string | undefined) => {
+    try {
+        const dates = await db.order.findMany({select: {date: true, itemname: true}, where: {userId}});
+        return dates;
+    } catch {
+        return null
+    }
+}

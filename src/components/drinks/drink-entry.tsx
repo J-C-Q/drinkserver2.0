@@ -16,8 +16,9 @@ import { toast } from "sonner";
 
 import { order } from "@/actions/order";
 import { fetchItemQuantity } from "@/actions/fetch-item-quantity";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface DrinkEntryProps {
   drinkname: string;
@@ -65,6 +66,8 @@ export const DrinkEntry = ({
     "bg-schwarz",
     "bg-weiss",
   ];
+
+  const router = useRouter();
 
   return (
     <Drawer>
@@ -128,7 +131,7 @@ export const DrinkEntry = ({
                       if (data.error != undefined && data.error != "") {
                         toast.error(data.error);
                       }
-                      fetchquantity();
+                      //   fetchquantity();
                       return "Order processed!";
                     },
                     error: "Error",

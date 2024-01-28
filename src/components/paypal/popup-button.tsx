@@ -13,6 +13,7 @@ import {
 import { FaPaypal } from "react-icons/fa";
 import { PayButton } from "./pay-button";
 import { HiMiniInformationCircle } from "react-icons/hi2";
+import { PiWarningOctagonFill } from "react-icons/pi";
 interface PopupButtonProps {
   total: number;
 }
@@ -29,34 +30,34 @@ export const PopupButton = ({ total }: PopupButtonProps) => {
           <span className="ml-1">Paypal.me</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-800 to-black border-amber-200 rounded-lg box-border mx-auto max-w-[90%]">
+      <DialogContent className="bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-800 to-black border-white rounded-lg box-border mx-auto max-w-[90%]">
         <DialogHeader>
           <DialogTitle className="text-white mb-2">
             You will be redirected to{" "}
-            <span className="bg-gradient-to-r from-amber-400  to-amber-200 inline-block text-transparent bg-clip-text">
-              paypal.com/paypalme/officeDrinks/
+            <span className="text-gray-400">
+              paypal.com/paypalme/officeDrinks
             </span>
           </DialogTitle>
           <DialogDescription className="flex flex-col gap-2">
-            <div className="rounded-lg bg-gradient-to-r from-blue-500 via-transparent to-trasparent border-blue-500 border  p-2 text-left flex flex-row items-center gap-2 text-blue-300 justify-start">
+            <div className="rounded-lg bg-gradient-to-r from-blue-500 via-transparent via-30% to-trasparent border-blue-500 border  p-2 text-left flex flex-row items-center gap-2 text-blue-200 justify-start">
               <span className="w-[20px] h-[20px] flex items-center justify-center">
                 <HiMiniInformationCircle className="w-[20px] h-[20px]" />
               </span>
               Once you&apos;ve paid, an admin will manually confirm your payment
               and mark your orders as paid.
             </div>
-            <div className="rounded-lg bg-gradient-to-r from-blue-500 via-transparent to-trasparent border-blue-500 border  p-2 text-left flex flex-row items-center gap-2 text-blue-300 justify-start">
-              <span className="w-[20px] h-[20px] flex items-center justify-center">
-                <HiMiniInformationCircle className="w-[20px] h-[20px]" />
-              </span>
-              Please refrain from adding new drinks until confirmation is
-              complete.
-            </div>
-            <div className="rounded-lg bg-gradient-to-r from-blue-500 via-transparent to-trasparent border-blue-500 border  p-2 text-left flex flex-row items-center justify-start gap-2 text-blue-300">
+            <div className="rounded-lg bg-gradient-to-r from-blue-500 via-transparent via-30% to-trasparent border-blue-500 border  p-2 text-left flex flex-row items-center justify-start gap-2 text-blue-200">
               <span className="w-[20px] h-[20px] flex items-center justify-center">
                 <HiMiniInformationCircle className="w-[20px] h-[20px]" />
               </span>
               Refresh your dashboard to check the status of your orders.
+            </div>
+            <div className="rounded-lg bg-gradient-to-r from-yellow-500 via-transparent  via-30% to-trasparent border-yellow-500 border  p-2 text-left flex flex-row items-center gap-2 text-yellow-200 justify-start">
+              <span className="w-[20px] h-[20px] flex items-center justify-center">
+                <PiWarningOctagonFill className="w-[20px] h-[20px]" />
+              </span>
+              Please refrain from adding new drinks until confirmation is
+              complete.
             </div>
           </DialogDescription>
         </DialogHeader>
