@@ -23,6 +23,12 @@ enum OrderStatus {
     CANCELLED
 }
 
+enum Rarity {
+    COMMON
+    RARE
+    LEGENDARY
+}
+
 model User {
     id            String    @id @default(cuid())
     name          String?
@@ -33,6 +39,7 @@ model User {
     password      String?
     role          UserRole  @default(USER)
     accounts      Account[]
+    achievements  String[]
 }
 
 model Account {
@@ -96,4 +103,12 @@ model Item {
     description  String?
     bgcolor      String?
     color        String?
+}
+
+model Achievement {
+    id          String  @id @default(cuid())
+    name        String  @unique
+    description String
+    rarity      Rarity  @default(COMMON)
+    image       String?
 }

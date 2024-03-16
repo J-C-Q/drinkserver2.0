@@ -8,6 +8,10 @@ import { OrderTable } from "@/components/drinks/order-table";
 import { getOrdersForUser } from "@/data/order";
 
 import { GithubLike } from "@/components/stats/github-like-grid";
+import { Achievements } from "@/components/stats/achievements";
+import { getAchievementsOfUser } from "@/data/achievements";
+import { updateAchievements } from "@/actions/update-achievements";
+import { Rarity } from "@prisma/client";
 
 type WeekDays =
   | "Sunday"
@@ -20,6 +24,14 @@ type WeekDays =
 type HourlyBuckets = { [hour: number]: number };
 type WeeklyBuckets = { [day in WeekDays]: HourlyBuckets };
 
+type Achievement = {
+  id: string;
+  name: string;
+  description: string;
+  rarity: Rarity;
+  image: string | null;
+};
+
 const StatsPage = async () => {
   const session = await auth();
 
@@ -30,19 +42,20 @@ const StatsPage = async () => {
   if (data) {
     addToBuckets(data, buckets);
   }
-  //   console.log(buckets);
-
-  // sort data into buckets by date. 1 bucket per hour of the day, for 1 week (7 times 24 buckets)
-  // each bucket has a count of orders for that hour of the day
+  await updateAchievements(session?.user.id);
+  const achievements = (await getAchievementsOfUser(
+    session?.user.id
+  )) as Achievement[];
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen w-full">
       <Navigator
         username={session?.user.name}
         greeting={"Stats for "}
         subtitle={"Understand your patterns"}
       ></Navigator>
       <GithubLike data={buckets} />
+      <Achievements achievements={achievements} />
     </main>
   );
 };
