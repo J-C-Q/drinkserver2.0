@@ -28,6 +28,7 @@ export const Navigator = ({ username, greeting, subtitle }: NavigatorProps) => {
   const [open, setOpen] = useState(false);
   const onClick = () => {
     setOpen(!open);
+    logout();
   };
   return (
     <nav className="my-5 w-[80vw] mx-auto h-20 bg-secondary text-secondary-foreground shadow-sm rounded-md flex items-center justify-between px-5">
@@ -99,7 +100,7 @@ export const Navigator = ({ username, greeting, subtitle }: NavigatorProps) => {
             <Button
               className=" w-full p-2 hover:bg-secondary-foreground hover:text-secondary bg-destructive"
               variant={"secondary"}
-              onClick={logout}
+              onClick={onClick}
             >
               <IoLogOutSharp className="h-5 w-5 hover:scale-110" />
               <span className="ml-1">Logout</span>
