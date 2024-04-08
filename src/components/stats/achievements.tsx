@@ -5,14 +5,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { Rarity } from "@prisma/client";
 
-// type for achievements
 type Achievement = {
   id: string;
   name: string;
   description: string;
-  rarity: Rarity;
+  rarity: string;
   image: string | null;
 };
 

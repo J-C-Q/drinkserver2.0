@@ -17,12 +17,12 @@ export const updateAchievements = async (userid: string | undefined) => {
     const orders = await getOrdersForUser(userid);
     const possibleAchievements = await getAllAchievements();
     const achievements = await getAchievementsOfUser(userid)
-    const achievementIds = achievements.map((achievement: Achievement) => achievement.id);
+    
 
     if (orders == null || possibleAchievements == null || achievements == null) {
         return { error: "Error while fetching data", code: 500 };
     }
-
+    const achievementIds = achievements.map((achievement: Achievement) => achievement.id);
     for (let achievement in possibleAchievements) {
         // if(!(achievements.includes(possibleAchievements[achievement]))) {
         // check if the user has the required orders	
