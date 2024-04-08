@@ -53,6 +53,8 @@ function checkAchievement(orders: Order[], achievementName: string) {
             return checkWeekendWarrior(orders);
         case "Thirsty":
             return checkThirsty(orders);
+        case "Junkie":
+            return checkJunkie(orders);
     }
 }
 
@@ -90,7 +92,8 @@ function checkWeekendWarrior(orders: Order[]) {
     return false;
 }
 
-function checkThirsty(orders: Order[]) {
+
+function checkNDrinksADay(orders: Order[], N: number) {
 
     if (orders.length == 0) {
         return false;
@@ -105,7 +108,7 @@ function checkThirsty(orders: Order[]) {
             orders[i].date.getFullYear() == lastOrder.date.getFullYear()
         ) {
             count++;
-            if (count >= 3) {
+            if (count >= N) {
                 return true;
             }
         }
@@ -117,3 +120,11 @@ function checkThirsty(orders: Order[]) {
     return false;
 }
 
+
+function checkThirsty(orders: Order[]) {
+    return checkNDrinksADay(orders, 3);
+}
+
+function checkJunkie(orders: Order[]) {
+    return checkNDrinksADay(orders, 5);
+}
