@@ -11,7 +11,12 @@ import { GithubLike } from "@/components/stats/github-like-grid";
 import { Achievements } from "@/components/stats/achievements";
 import { getAchievementsOfUser } from "@/data/achievements";
 import { updateAchievements } from "@/actions/update-achievements";
-import { Rarity } from "@prisma/client";
+
+enum Rarity {
+  COMMON = 1,
+  RARE = 2,
+  LEGENDARY = 3,
+}
 
 type WeekDays =
   | "Sunday"

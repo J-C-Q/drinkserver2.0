@@ -6,11 +6,18 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
+enum Rarity {
+  COMMON = 1,
+  RARE = 2,
+  LEGENDARY = 3,
+}
+
+// type for achievements
 type Achievement = {
   id: string;
   name: string;
   description: string;
-  rarity: string;
+  rarity: Rarity;
   image: string | null;
 };
 
@@ -105,13 +112,13 @@ export const Achievements = ({ achievements }: Achievements) => {
   );
 };
 
-function rarityToColor(rarity: string) {
+function rarityToColor(rarity: Rarity) {
   switch (rarity) {
-    case "COMMON":
+    case 1:
       return "bg-gray-400";
-    case "RARE":
+    case 2:
       return "bg-amber-400";
-    case "LEGENDARY":
+    case 3:
       return "bg-amber-600";
   }
 }
