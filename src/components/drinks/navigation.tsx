@@ -100,7 +100,7 @@ export const Navigator = ({ username, greeting, subtitle }: NavigatorProps) => {
             <Button
               className=" w-full p-2 hover:bg-secondary-foreground hover:text-secondary bg-destructive"
               variant={"secondary"}
-              onClick={onClick}
+              onClick={logout}
             >
               <IoLogOutSharp className="h-5 w-5 hover:scale-110" />
               <span className="ml-1">Logout</span>
