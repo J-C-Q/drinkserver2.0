@@ -104,7 +104,7 @@ function rarityToColor(rarity: string) {
       return "bg-gray-400";
     case "RARE":
       return "bg-amber-400";
-    case "LEGANDARY":
+    case "LEGENDARY":
       return "bg-amber-600";
   }
 }
