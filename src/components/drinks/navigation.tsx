@@ -28,7 +28,6 @@ export const Navigator = ({ username, greeting, subtitle }: NavigatorProps) => {
   const [open, setOpen] = useState(false);
   const onClick = () => {
     setOpen(!open);
-    console.log(open);
   };
   return (
     <nav className="my-5 w-[80vw] mx-auto h-20 bg-secondary text-secondary-foreground shadow-sm rounded-md flex items-center justify-between px-5">
