@@ -101,6 +101,12 @@ const DrinksPage = async () => {
                   drinkid={drink.itemid}
                   drinkprice={drink.itemprice}
                   drinkquantity={drink.quantity}
+                  drinkEnergy={drink.energy ? drink.energy : undefined}
+                  drinkCarbohydrates={
+                    drink.carbohydrate ? drink.carbohydrate : undefined
+                  }
+                  drinkSugars={drink.sugar ? drink.sugar : undefined}
+                  drinkCaffein={drink.caffeine ? drink.caffeine : undefined}
                   selectedQuote={getRandomElement(possibleQuotes)}
                   bgimage={drink.image ? drink.image : undefined}
                   bgcolor={drink.bgcolor ? drink.bgcolor : undefined}

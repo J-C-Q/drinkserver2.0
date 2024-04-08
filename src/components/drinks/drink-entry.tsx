@@ -12,6 +12,17 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableFooter,
+} from "@/components/ui/table";
+
 import { toast } from "sonner";
 
 import { order } from "@/actions/order";
@@ -25,6 +36,10 @@ interface DrinkEntryProps {
   drinkid: string;
   drinkprice: number;
   drinkquantity: number;
+  drinkEnergy?: number;
+  drinkCarbohydrates?: number;
+  drinkSugars?: number;
+  drinkCaffein?: number;
   selectedQuote?: string;
   bgimage?: string;
   bgcolor?: string;
@@ -35,6 +50,10 @@ export const DrinkEntry = ({
   drinkid,
   drinkprice,
   drinkquantity,
+  drinkEnergy,
+  drinkCarbohydrates,
+  drinkSugars,
+  drinkCaffein,
   selectedQuote,
   bgimage,
   bgcolor,
@@ -112,6 +131,31 @@ export const DrinkEntry = ({
           >
             {selectedQuote != undefined ? selectedQuote : ""}
           </DrawerDescription>
+          {/* <Table className="w-[80%] h-10 m-auto">
+            <TableCaption>Nutritional information</TableCaption>
+            <TableBody className="text-white">
+              <TableRow>
+                <TableCell className="font-medium">Energy</TableCell>
+                <TableCell className="font-medium">
+                  {drinkEnergy} kcal
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-medium">Carbohydrates</TableCell>
+                <TableCell className="font-medium">
+                  {drinkCarbohydrates} g
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-medium">Sugars</TableCell>
+                <TableCell className="font-medium">{drinkSugars} g</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-medium">Caffein</TableCell>
+                <TableCell className="font-medium">{drinkCaffein} mg</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table> */}
         </DrawerHeader>
         <DrawerFooter
           className={"text-md relative sm:text-xl  " + `text-${color}`}
