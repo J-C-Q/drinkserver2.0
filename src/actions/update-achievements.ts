@@ -3,21 +3,8 @@
 import { getOrdersForUser } from "@/data/order";
 import { addAchievementToUser, getAllAchievements } from "@/data/achievements";
 import { getAchievementsOfUser } from "@/data/achievements";
+import { Achievement } from '@prisma/client'
 
-enum Rarity {
-    COMMON = 1,
-    RARE = 2,
-    LEGENDARY = 3,
-  }
-  
-  // type for achievements
-  type Achievement = {
-    id: string;
-    name: string;
-    description: string;
-    rarity: Rarity;
-    image: string | null;
-  };
 export const updateAchievements = async (userid: string | undefined) => {
 
     const orders = await getOrdersForUser(userid);

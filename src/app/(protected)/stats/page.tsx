@@ -11,13 +11,7 @@ import { GithubLike } from "@/components/stats/github-like-grid";
 import { Achievements } from "@/components/stats/achievements";
 import { getAchievementsOfUser } from "@/data/achievements";
 import { updateAchievements } from "@/actions/update-achievements";
-
-enum Rarity {
-  COMMON = 1,
-  RARE = 2,
-  LEGENDARY = 3,
-}
-
+import { Achievement } from "@prisma/client";
 type WeekDays =
   | "Sunday"
   | "Monday"
@@ -28,14 +22,6 @@ type WeekDays =
   | "Saturday";
 type HourlyBuckets = { [hour: number]: number };
 type WeeklyBuckets = { [day in WeekDays]: HourlyBuckets };
-
-type Achievement = {
-  id: string;
-  name: string;
-  description: string;
-  rarity: Rarity;
-  image: string | null;
-};
 
 const StatsPage = async () => {
   const session = await auth();

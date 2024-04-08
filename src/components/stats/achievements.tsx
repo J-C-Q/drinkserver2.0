@@ -5,21 +5,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-
-enum Rarity {
-  COMMON = 1,
-  RARE = 2,
-  LEGENDARY = 3,
-}
-
-// type for achievements
-type Achievement = {
-  id: string;
-  name: string;
-  description: string;
-  rarity: Rarity;
-  image: string | null;
-};
+import { Achievement } from "@prisma/client";
 
 type Achievements = {
   achievements: Achievement[];
@@ -112,13 +98,13 @@ export const Achievements = ({ achievements }: Achievements) => {
   );
 };
 
-function rarityToColor(rarity: Rarity) {
+function rarityToColor(rarity: string) {
   switch (rarity) {
-    case 1:
+    case "COMMON":
       return "bg-gray-400";
-    case 2:
+    case "RARE":
       return "bg-amber-400";
-    case 3:
+    case "LEGANDARY":
       return "bg-amber-600";
   }
 }
