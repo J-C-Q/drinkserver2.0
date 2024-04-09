@@ -120,7 +120,7 @@ export const DrinkEntry = ({
         </div>
       </DrawerTrigger>
       <DrawerContent
-        className={"h-[50vh] border-none outline-none " + `bg-${bgcolor}`}
+        className={"h-fit border-none outline-none " + `bg-${bgcolor}`}
       >
         <DrawerHeader>
           <DrawerTitle className={"text-4xl sm:text-6xl " + `text-${color}`}>
@@ -131,31 +131,43 @@ export const DrinkEntry = ({
           >
             {selectedQuote != undefined ? selectedQuote : ""}
           </DrawerDescription>
-          {/* <Table className="w-[80%] h-10 m-auto">
-            <TableCaption>Nutritional information</TableCaption>
-            <TableBody className="text-white">
+          <Table className="w-[80%] h-10 m-auto">
+            {/* <TableCaption>Nutritional information</TableCaption> */}
+            <TableBody className={`text-${color}`}>
               <TableRow>
-                <TableCell className="font-medium">Energy</TableCell>
+                <TableCell className="font-medium text-left">Energy</TableCell>
                 <TableCell className="font-medium">
-                  {drinkEnergy} kcal
+                  {!drinkEnergy || drinkEnergy == 0
+                    ? "-"
+                    : drinkEnergy + " kcal"}
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="font-medium">Carbohydrates</TableCell>
+                <TableCell className="font-medium text-left">
+                  Carbohydrates
+                </TableCell>
                 <TableCell className="font-medium">
-                  {drinkCarbohydrates} g
+                  {!drinkCarbohydrates || drinkCarbohydrates == 0
+                    ? "-"
+                    : drinkCarbohydrates + " g"}
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="font-medium">Sugars</TableCell>
-                <TableCell className="font-medium">{drinkSugars} g</TableCell>
+                <TableCell className="font-medium text-left">Sugars</TableCell>
+                <TableCell className="font-medium">
+                  {!drinkSugars || drinkSugars == 0 ? "-" : drinkSugars + " g"}
+                </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="font-medium">Caffein</TableCell>
-                <TableCell className="font-medium">{drinkCaffein} mg</TableCell>
+                <TableCell className="font-medium text-left">Caffein</TableCell>
+                <TableCell className="font-medium">
+                  {!drinkCaffein || drinkCaffein == 0
+                    ? "-"
+                    : drinkCaffein + " mg"}
+                </TableCell>
               </TableRow>
             </TableBody>
-          </Table> */}
+          </Table>
         </DrawerHeader>
         <DrawerFooter
           className={"text-md relative sm:text-xl  " + `text-${color}`}
