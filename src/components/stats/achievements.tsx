@@ -18,7 +18,7 @@ export const Achievements = ({
 }: AchievementProps) => {
   const fillArray = new Array(10).fill(10);
   return (
-    <div className="p-5 flex flex-wrap gap-2 justify-left pt-10">
+    <div className="p-5 flex flex-wrap gap-2 justify-left pt-10 w-[85%] m-auto">
       {achievements.map((achievement) => (
         <Badge
           key={achievement.id}
