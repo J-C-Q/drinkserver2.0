@@ -9,9 +9,13 @@ import { getOrdersForUser } from "@/data/order";
 
 import { GithubLike } from "@/components/stats/github-like-grid";
 import { Achievements } from "@/components/stats/achievements";
-import { getAchievementsOfUser } from "@/data/achievements";
+import {
+  getAchievementsOfUser,
+  getAchievementsUserDoesntHave,
+} from "@/data/achievements";
 import { updateAchievements } from "@/actions/update-achievements";
 import { Achievement } from "@prisma/client";
+
 type WeekDays =
   | "Sunday"
   | "Monday"
@@ -38,6 +42,10 @@ const StatsPage = async () => {
     session?.user.id
   )) as Achievement[];
 
+  const openAchievements = (await getAchievementsUserDoesntHave(
+    session?.user.id
+  )) as Achievement[];
+
   return (
     <main className="min-h-screen w-full">
       <Navigator
@@ -46,7 +54,10 @@ const StatsPage = async () => {
         subtitle={"Understand your patterns"}
       ></Navigator>
       <GithubLike data={buckets} />
-      <Achievements achievements={achievements} />
+      <Achievements
+        achievements={achievements}
+        openAchievements={openAchievements}
+      />
     </main>
   );
 };
