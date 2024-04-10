@@ -18,45 +18,37 @@ export const Achievements = ({
 }: AchievementProps) => {
   const fillArray = new Array(10).fill(10);
   return (
-    <div className="p-5 flex flex-wrap gap-2 justify-left pt-10 w-[85%] m-auto">
+    <div className="flex flex-wrap gap-2 justify-start pt-10 w-[75%] m-auto relative">
       {achievements.map((achievement) => (
         <Badge
           key={achievement.id}
-          className={rarityToStyle(achievement.rarity)}
+          className={
+            rarityToStyle(achievement.rarity) +
+            " text-sm font-semibold grow justify-center group border-4"
+          }
         >
-          {achievement.name}
+          <span className="group-active:hidden group-hover:hidden">
+            {achievement.name}
+          </span>
+          <span className="hidden group-active:block group-hover:block">
+            {achievement.description}
+          </span>
         </Badge>
-        // <Popover key={achievement.id}>
-        //   <PopoverTrigger asChild>
-        //     <div
-        //       className={
-        //         "text-lg font-semibold px-1 rounded-md " +
-        //         rarityToColor(achievement.rarity)
-        //       }
-        //       key={achievement.id}
-        //     >
-        //       {achievement.name}
-        //     </div>
-        //   </PopoverTrigger>
-        //   <PopoverContent
-        //     className={
-        //       "h-fit w-40 m-0 text-black py-0 px-1 border-none " +
-        //       rarityToColor(achievement.rarity)
-        //     }
-        //   >
-        //     <div className="font-semibold text-lg">{achievement.name}</div>
-        //     <span>{achievement.description}</span>
-        //   </PopoverContent>
-        // </Popover>
       ))}
       {openAchievements.map((achievement) => (
         <Badge
           key={achievement.id}
-          className={rarityToStyle(achievement.rarity) + " blur-sm"}
+          className={
+            // rarityToStyle(achievement.rarity) +
+            " bg-gray-800  border-gray-100 border-4 blur-sm opacity-20 brightness-50 text-sm font-semibold grow justify-center"
+          }
         >
           {achievement.name}
         </Badge>
       ))}
+      <span className="w-full text-sm text-center absolute bottom-[-20px] translate-y-[100%] text-gray-600">
+        Your achievements
+      </span>
     </div>
   );
 };
@@ -64,10 +56,10 @@ export const Achievements = ({
 function rarityToStyle(rarity: string) {
   switch (rarity) {
     case "COMMON":
-      return "text-gray-400 bg-gray-900";
+      return "text-[#462700] bg-gradient-to-tr from-[#CD7F32] to-[#ad6415]";
     case "RARE":
-      return "text-gray-700 bg-slate-300";
+      return "text-[#333333] bg-gradient-to-tr from-[#C0C0C0] to-[#a3a3a3] ";
     case "LEGENDARY":
-      return "text-amber-700 bg-[linear-gradient(110deg,#fbbf24,45%,#fde68a,55%,#fbbf24)] bg-[length:200%_100%] animate-shimmer delay-1000 transition-colors";
+      return "text-[#333333] bg-[linear-gradient(110deg,#ddb900,45%,#FFD700,55%,#ddb900)] bg-[length:200%_100%] animate-shimmer delay-1000 transition-colors";
   }
 }

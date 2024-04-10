@@ -97,7 +97,7 @@ export const GithubLike = ({ data }: GithubLikeProps) => {
               ))}
             </div>
           ))}
-        <span className="w-full text-center absolute bottom-[-2%] translate-y-[100%] text-gray-600 group-active:opacity-0 group-hover:opacity-0 opacity-100 transition-opacity duration-200">
+        <span className="w-full text-center absolute bottom-[-10px] translate-y-[100%] text-gray-600 group-active:opacity-0 group-hover:opacity-0 opacity-100 transition-opacity duration-200">
           Your drink heatmap
         </span>
       </div>
