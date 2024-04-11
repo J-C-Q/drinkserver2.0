@@ -21,7 +21,7 @@ export const Achievements = ({
 }: AchievementProps) => {
   const fillArray = new Array(10).fill(10);
   return (
-    <div className="flex flex-wrap gap-2 justify-center pt-10 w-[75%] m-auto relative ">
+    <div className="flex flex-wrap gap-2 justify-center pt-10 w-[75%] m-auto relative select-none">
       {achievements.map((achievement) => (
         <Button
           asChild
