@@ -47,8 +47,8 @@ export const GithubLike = ({ data }: GithubLikeProps) => {
     "opacity-[1.0]",
   ];
   return (
-    <div className=" text-gray-500 text-sm sm:w-[80%] sm:mx-auto w-full px-10">
-      <div className="aspect-[24/7] grid grid-rows-7 grid-cols-1 gap-[1%] relative my-10 mx-2 group ">
+    <div className=" text-gray-500 text-sm sm:w-[80%] sm:mx-auto w-full px-10 pt-0">
+      <div className="aspect-[24/7] grid grid-rows-7 grid-cols-1 gap-[1%] relative my-10 mx-0 group ">
         {data &&
           Object.keys(data).map((day) => (
             <div

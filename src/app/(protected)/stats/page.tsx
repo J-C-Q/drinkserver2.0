@@ -15,6 +15,8 @@ import {
 } from "@/data/achievements";
 import { updateAchievements } from "@/actions/update-achievements";
 import { Achievement } from "@prisma/client";
+import { MainStats } from "@/components/stats/mainstats";
+import { getTotalSugarAndCaffeinOfUser } from "@/data/stats";
 
 type WeekDays =
   | "Sunday"
@@ -46,6 +48,7 @@ const StatsPage = async () => {
     session?.user.id
   )) as Achievement[];
 
+  const stats = await getTotalSugarAndCaffeinOfUser(session?.user.id);
   return (
     <main className="min-h-screen w-full">
       <Navigator
@@ -53,11 +56,16 @@ const StatsPage = async () => {
         greeting={"Stats for "}
         subtitle={"Understand your patterns"}
       ></Navigator>
+      <MainStats
+        totalSugar={stats?.totalSugar}
+        totalCaffein={stats?.totalCaffeine}
+      />
       <GithubLike data={buckets} />
       <Achievements
         achievements={achievements}
         openAchievements={openAchievements}
       />
+      <Toaster richColors />
     </main>
   );
 };

@@ -7,6 +7,9 @@ import {
 import { cn } from "@/lib/utils";
 import { Achievement } from "@prisma/client";
 import { Badge } from "../ui/badge";
+import { toast } from "sonner";
+import { Button } from "../ui/button";
+import { Toaster } from "@/components/ui/sonner";
 
 interface AchievementProps {
   achievements: Achievement[];
@@ -18,29 +21,33 @@ export const Achievements = ({
 }: AchievementProps) => {
   const fillArray = new Array(10).fill(10);
   return (
-    <div className="flex flex-wrap gap-2 justify-start pt-10 w-[75%] m-auto relative">
+    <div className="flex flex-wrap gap-2 justify-center pt-10 w-[75%] m-auto relative ">
       {achievements.map((achievement) => (
-        <Badge
+        <Button
+          asChild
           key={achievement.id}
-          className={
-            rarityToStyle(achievement.rarity) +
-            " text-sm font-semibold grow justify-center group border-4"
-          }
+          onClick={() => toast.info(achievement.description)}
+          className="px-1 rounded-xl h-5"
         >
-          <span className="group-active:hidden group-hover:hidden">
-            {achievement.name}
-          </span>
-          <span className="hidden group-active:block group-hover:block">
+          <Badge
+            className={
+              rarityToStyle(achievement.rarity) +
+              " text-sm font-semibold grow justify-center box-border border-transparent group"
+            }
+          >
+            <span className="">{achievement.name}</span>
+            {/* <span className="hidden group-active:block group-hover:block">
             {achievement.description}
-          </span>
-        </Badge>
+          </span> */}
+          </Badge>
+        </Button>
       ))}
       {openAchievements.map((achievement) => (
         <Badge
           key={achievement.id}
           className={
             // rarityToStyle(achievement.rarity) +
-            " bg-gray-800  border-gray-100 border-4 blur-sm opacity-20 brightness-50 text-sm font-semibold grow justify-center"
+            " bg-gray-800  border-gray-100 blur-sm opacity-20 brightness-50 text-sm text-white font-semibold grow justify-center box-border border-4 h-6"
           }
         >
           {achievement.name}
