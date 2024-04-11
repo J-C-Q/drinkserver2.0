@@ -12,7 +12,7 @@ export const MainStats = (
 ) => {
   return (
     <div className="grid grid-rows-1 grid-cols-2 gap-5 pt-0 w-[100%] m-auto relative ">
-      <div className="bg-gradient-to-tr from-[#FF6B6B] to-[#dd4d51] grow text-center aspect-square text-5xl flex justify-center items-center relative bg-clip-text text-transparent translate-y-[-10%] italic">
+      <div className="bg-gradient-to-tr from-[#FF6B6B] to-[#dd4d51] grow text-center aspect-square text-5xl flex justify-center items-center relative bg-clip-text text-transparent translate-y-[-10%]  m-auto">
         {totalSugar ? (totalSugar / 1000).toFixed(2) : 0}
         <div className="absolute text-sm left-[50%] translate-x-[-150%] top-[50%] translate-y-[-200%] text-gray-600 not-italic">
           sugar
@@ -21,7 +21,7 @@ export const MainStats = (
           kg
         </div>
       </div>
-      <div className="bg-gradient-to-tr from-[#FFD700] to-[#ddb900] grow text-center aspect-square text-5xl flex justify-center items-center relative bg-clip-text text-transparent translate-y-[10%] italic">
+      <div className="bg-gradient-to-tr from-[#FFD700] to-[#ddb900] grow text-center aspect-square text-5xl flex justify-center items-center relative bg-clip-text text-transparent translate-y-[10%]   m-auto">
         {totalCaffein ? (totalCaffein / 1000).toFixed(2) : 0}
         <div className="absolute text-sm left-[50%] translate-x-[-150%] top-[50%] translate-y-[-200%] text-gray-600 not-italic">
           caffein
