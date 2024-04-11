@@ -52,6 +52,8 @@ function checkAchievement(orders: Order[], items: Item[], achievementName: strin
             return checkJunkie(orders);
         case "Caffein Bomb":
             return checkCaffeinBomb(orders, items);
+        case "Caffein Overdose":
+            return checkCaffeinOverdose(orders,items);
         case "Sugar Shock":
             return checkSugarShock(orders, items);
         case "Regular":
@@ -182,6 +184,47 @@ function checkCaffeinBomb(orders: Order[], items: Item[]) {
 
             caffeine += indexMap.get(orders[i].itemname) ?? 0;
             if (caffeine >= 200) {
+                return true;
+            }
+        }
+        else {
+            caffeine = indexMap.get(orders[i].itemname) ?? 0;
+            lastOrder = orders[i];
+        }
+    }
+    return false;
+}
+
+function checkCaffeinOverdose(orders: Order[], items: Item[]) {
+
+    if (orders.length == 0) {
+        return false;
+    }
+
+    // import caffeine values from the items db
+    const indexMap: Map<string, number> = new Map();
+
+    if (items) {
+        for (let item of items) {
+            indexMap.set(item.itemname, item.caffeine ?? 0);
+        }
+    } else {
+        return false;
+    }
+
+    let caffeine = indexMap.get(orders[0].itemname) ?? 0;
+    let lastOrder = orders[0];
+
+    // for loop starting from the second order
+    for (let i = 1; i < orders.length; i++) {
+        if (
+            orders[i].date.getDate() == lastOrder.date.getDate() &&
+            orders[i].date.getMonth() == lastOrder.date.getMonth() &&
+            orders[i].date.getFullYear() == lastOrder.date.getFullYear()
+        ) {
+
+            caffeine += indexMap.get(orders[i].itemname) ?? 0;
+            if (caffeine >= 400) {
                 return true;
             }
         }

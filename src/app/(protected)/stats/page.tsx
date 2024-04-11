@@ -115,7 +115,6 @@ function addToBuckets(
         })
         .slice(0, 3)
     ) as unknown as number;
-    console.log(hour);
     buckets[day][hour]++;
   });
 }
