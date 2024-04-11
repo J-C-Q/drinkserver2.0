@@ -102,7 +102,7 @@ function checkNDrinksADay(orders: Order[], N: number) {
     // for loop starting from the second order
     for (let i = 1; i < orders.length; i++) {
         if (
-            orders[i].date.getDay() == lastOrder.date.getDay() &&
+            orders[i].date.getDate() == lastOrder.date.getDate() &&
             orders[i].date.getMonth() == lastOrder.date.getMonth() &&
             orders[i].date.getFullYear() == lastOrder.date.getFullYear()
         ) {
@@ -151,7 +151,7 @@ function checkCaffeinBomb(orders: Order[], items: Item[]) {
     // for loop starting from the second order
     for (let i = 1; i < orders.length; i++) {
         if (
-            orders[i].date.getDay() == lastOrder.date.getDay() &&
+            orders[i].date.getDate() == lastOrder.date.getDate() &&
             orders[i].date.getMonth() == lastOrder.date.getMonth() &&
             orders[i].date.getFullYear() == lastOrder.date.getFullYear()
         ) {
@@ -170,6 +170,7 @@ function checkCaffeinBomb(orders: Order[], items: Item[]) {
 }
 
 function checkSugarShock(orders: Order[], items: Item[]) {
+
 
     if (orders.length == 0) {
         return false;
@@ -192,11 +193,9 @@ function checkSugarShock(orders: Order[], items: Item[]) {
     // for loop starting from the second order
     for (let i = 1; i < orders.length; i++) {
         if (
-            orders[i].date.getDay() == lastOrder.date.getDay() &&
+            orders[i].date.getDate() == lastOrder.date.getDate() &&
             orders[i].date.getMonth() == lastOrder.date.getMonth() &&
-            orders[i].date.getFullYear() == lastOrder.date.getFullYear()
-        ) {
-
+            orders[i].date.getFullYear() == lastOrder.date.getFullYear()) {
             sugar += indexMap.get(orders[i].itemname) ?? 0;
             if (sugar >= 50) {
                 return true;
