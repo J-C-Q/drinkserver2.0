@@ -89,7 +89,6 @@ function checkLoyal(orders: Order[]){
 
 
 function checkNightOwl(orders: Order[]) {
-    let count = 0;
     for (let order of orders) {
         if (order.date.getHours() >= 23 && order.date.getHours() <= 4) {
             return true;
@@ -99,9 +98,8 @@ function checkNightOwl(orders: Order[]) {
 }
 
 function checkEarlyBird(orders: Order[]) {
-    let count = 0;
     for (let order of orders) {
-        if (order.date.getHours() >= 6 && order.date.getHours() <= 8) {
+        if ((order.date.getHours() >= 6) && order.date.getHours() <= 7) {
             return true;
         }
     }
