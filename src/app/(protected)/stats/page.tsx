@@ -16,7 +16,12 @@ import {
 import { updateAchievements } from "@/actions/update-achievements";
 import { Achievement } from "@prisma/client";
 import { MainStats } from "@/components/stats/mainstats";
-import { getTotalSugarAndCaffeinOfUser } from "@/data/stats";
+import {
+  getLastWeekSugarAndCaffeinOfUser,
+  getTodaySugarAndCaffeinOfUser,
+  getTotalSugarAndCaffeinOfUser,
+  getLastMonthSugarAndCaffeinOfUser,
+} from "@/data/stats";
 
 type WeekDays =
   | "Sunday"
@@ -48,7 +53,14 @@ const StatsPage = async () => {
     session?.user.id
   )) as Achievement[];
 
-  const stats = await getTotalSugarAndCaffeinOfUser(session?.user.id);
+  const statsTotal = await getTotalSugarAndCaffeinOfUser(session?.user.id);
+  const statsToday = await getTodaySugarAndCaffeinOfUser(session?.user.id);
+  const statsLastWeek = await getLastWeekSugarAndCaffeinOfUser(
+    session?.user.id
+  );
+  const statsLastMonth = await getLastMonthSugarAndCaffeinOfUser(
+    session?.user.id
+  );
   return (
     <main className="min-h-screen w-full">
       <Navigator
@@ -57,8 +69,14 @@ const StatsPage = async () => {
         subtitle={"Understand your patterns"}
       ></Navigator>
       <MainStats
-        totalSugar={stats?.totalSugar}
-        totalCaffein={stats?.totalCaffeine}
+        totalSugar={statsTotal?.totalSugar}
+        totalCaffein={statsTotal?.totalCaffeine}
+        todaySugar={statsToday?.todaySugar}
+        todayCaffein={statsToday?.todayCaffeine}
+        lastWeekSugar={statsLastWeek?.lastWeekSugar}
+        lastWeekCaffein={statsLastWeek?.lastWeekCaffeine}
+        lastMonthSugar={statsLastMonth?.lastMonthSugar}
+        lastMonthCaffein={statsLastMonth?.lastMonthCaffeine}
       />
       <GithubLike data={buckets} />
       <Achievements
