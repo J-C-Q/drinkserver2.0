@@ -315,6 +315,9 @@ function checkMoreInAWeek(orders: Order[], itemname:string){
             } else {
                 notDrinkThisWeek +=1;
             }
+            if (drinkThisWeek > notDrinkThisWeek && (drinkThisWeek+notDrinkThisWeek >= 5)) {
+                return true
+            }
         } else {
             if (drinkThisWeek > notDrinkThisWeek && (drinkThisWeek+notDrinkThisWeek >= 5)) {
                 return true
@@ -328,6 +331,7 @@ function checkMoreInAWeek(orders: Order[], itemname:string){
             }
             currentWeek = getWeek(order.date)
         }
+
     }
     return false
 }
@@ -360,4 +364,6 @@ function getWeek(date:Date) {
         }
         return weeknum;
     };
+
+    // console.log(getWeek(new Date(2024,3,22)))
     
