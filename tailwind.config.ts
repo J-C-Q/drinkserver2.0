@@ -57,6 +57,7 @@ const config = {
             'braun': '#1E0A01',
             'schwarz': '#000000',
             'weiss': '#FFFFFF',
+            'hellrot': '#e85b5b'
 
       },
       borderRadius: {

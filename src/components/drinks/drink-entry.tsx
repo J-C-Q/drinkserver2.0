@@ -86,6 +86,7 @@ export const DrinkEntry = ({
     "bg-weiss",
     "text-white/10",
     "text-black/10",
+    "bg-hellrot",
   ];
 
   const router = useRouter();
