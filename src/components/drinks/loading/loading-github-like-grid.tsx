@@ -9,10 +9,10 @@ import {
 export const LoadingGithubLike = () => {
   return (
     <div className=" text-gray-500 text-sm sm:w-[80%] sm:mx-auto w-full">
-      <div className="aspect-[24/7] grid grid-rows-7 grid-cols-1 gap-[1%] relative my-10 mx-2 group">
+      <div className="grid grid-rows-7 grid-cols-1 gap-[3px] sm:gap-[5px] relative my-10 mx-2 group">
         {Array.from(Array(7).keys()).map((day) => (
           <div
-            className="row-span-1 col-span-1 grid grid-rows-1 grid-cols-24 gap-[1%] grid-flow-col relative"
+            className="row-span-1 col-span-1 grid grid-rows-1 grid-cols-24 gap-[3px] sm:gap-[5px] grid-flow-col relative"
             key={day}
           >
             {Array.from(Array(24).keys()).map((hour) => (
