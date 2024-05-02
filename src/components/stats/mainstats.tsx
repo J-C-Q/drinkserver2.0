@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-
+import { Roboto_Mono } from "next/font/google";
+import { cn } from "@/lib/utils";
 interface MainStatsProps {
   totalSugar?: number;
   totalCaffein?: number;
@@ -12,6 +13,11 @@ interface MainStatsProps {
   lastMonthSugar?: number;
   lastMonthCaffein?: number;
 }
+
+const font = Roboto_Mono({
+  subsets: ["latin"],
+  weight: ["700"],
+});
 
 export const MainStats = (
   {
@@ -50,25 +56,36 @@ export const MainStats = (
         setPointer((pointer + 1) % 4);
       }}
     >
-      <div className="bg-gradient-to-tr from-[#FF6B6B] to-[#dd4d51] grow text-center aspect-square text-5xl flex justify-center items-center relative bg-clip-text text-transparent translate-y-[-10px] m-auto font-bold w-36">
+      <div
+        className={cn(
+          "bg-gradient-to-tr from-[#FF6B6B] to-[#dd4d51] grow text-center text-5xl flex justify-center items-center relative font-bold bg-clip-text text-transparent translate-y-[-10px] " +
+            font.className
+        )}
+      >
         {((sugarStats[pointer ?? 0] ?? 0) / 1000 ?? 0).toFixed(2)}
+
         <div className="absolute text-sm left-[50%] translate-x-[-60px] top-[50%] translate-y-[-40px] text-gray-600 not-italic whitespace-nowrap">
           sugar
         </div>
-        <div className="absolute text-sm  text-gray-600 not-italic left-[50%] translate-x-[50px] top-[50%] translate-y-[10%]">
+        <div className="absolute text-sm  text-gray-600 not-italic left-[50%] translate-x-[60px] top-[50%] translate-y-[10%]">
           kg
         </div>
       </div>
-      <div className="bg-gradient-to-tr from-[#FFD700] to-[#ddb900] grow text-center aspect-square text-5xl flex justify-center items-center relative bg-clip-text text-transparent translate-y-[10px] m-auto font-bold w-36">
+      <div
+        className={cn(
+          "bg-gradient-to-tr from-[#FFD700] to-[#ddb900] grow text-center text-5xl flex justify-center items-center relative font-bold bg-clip-text text-transparent translate-y-[10px] " +
+            font.className
+        )}
+      >
         {((caffeineStats[pointer ?? 0] ?? 0) / 1000).toFixed(2)}
         <div className="absolute text-sm left-[50%] translate-x-[-60px] top-[50%] translate-y-[-40px] text-gray-600 not-italic whitespace-nowrap">
           caffeine
         </div>
-        <div className="absolute text-sm  text-gray-600 not-italic left-[50%] translate-x-[50px] top-[50%] translate-y-[10%]">
+        <div className="absolute text-sm  text-gray-600 not-italic left-[50%] translate-x-[60px] top-[50%] translate-y-[10%]">
           g
         </div>
       </div>
-      <span className="w-full text-sm text-center absolute bottom-[0px] translate-y-[100%] text-gray-600">
+      <span className="w-full text-sm text-center absolute bottom-[25px] translate-y-[100%] text-gray-600">
         Your stats
       </span>
       <span className="w-full text-lg font-bold text-center absolute top-[-25px] translate-y-[100%] text-gray-600">
