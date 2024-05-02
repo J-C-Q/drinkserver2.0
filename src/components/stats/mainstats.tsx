@@ -51,14 +51,14 @@ export const MainStats = (
   let [pointer, setPointer] = useState(0);
   return (
     <div
-      className="grid grid-rows-1 grid-cols-2 gap-5 pt-0 w-[100%] m-auto relative h-28"
+      className="grid grid-rows-1 grid-cols-2 gap-5 pt-0 w-[100%] m-auto relative h-28 group"
       onClick={() => {
         setPointer((pointer + 1) % 4);
       }}
     >
       <div
         className={cn(
-          "bg-gradient-to-tr from-[#FF6B6B] to-[#dd4d51] grow text-center text-5xl flex justify-center items-center relative font-bold bg-clip-text text-transparent translate-y-[-10px] " +
+          "bg-gradient-to-tr from-[#FF6B6B] to-[#dd4d51] grow text-center text-5xl flex justify-center items-center relative font-bold bg-clip-text text-transparent translate-y-[-10px]  " +
             font.className
         )}
       >
@@ -88,7 +88,7 @@ export const MainStats = (
       <span className="w-full text-sm text-center absolute bottom-[25px] translate-y-[100%] text-gray-600">
         Your stats
       </span>
-      <span className="w-full text-lg font-bold text-center absolute top-[-25px] translate-y-[100%] text-gray-600">
+      <span className="w-full text-lg font-bold text-center absolute top-[-25px] translate-y-[100%] text-gray-600 group-active:scale-110 transition-scale duration-200">
         {times[pointer]}
       </span>
     </div>
