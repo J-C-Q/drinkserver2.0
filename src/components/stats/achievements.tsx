@@ -32,7 +32,7 @@ export const Achievements = ({
           <Badge
             className={
               rarityToStyle(achievement.rarity) +
-              " text-sm font-semibold grow justify-center box-border border-transparent group"
+              " text-sm font-semibold grow justify-center box-border border-transparent group active:scale-95 transition-scale duration-200"
             }
           >
             <span className="">{achievement.name}</span>

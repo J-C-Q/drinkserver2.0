@@ -88,7 +88,7 @@ export const MainStats = (
       <span className="w-full text-sm text-center absolute bottom-[25px] translate-y-[100%] text-gray-600">
         Your stats
       </span>
-      <span className="w-full text-lg font-bold text-center absolute top-[-25px] translate-y-[100%] text-gray-600 group-active:scale-110 transition-scale duration-200">
+      <span className="text-lg font-bold text-center absolute top-[-25px] left-[50%] translate-y-[100%] translate-x-[-50%] text-gray-600 group-active:scale-110 transition-scale duration-200 w-24">
         {times[pointer]}
       </span>
     </div>

@@ -112,10 +112,10 @@ export const DrinkEntry = ({
           )}
           <span
             className={
-              "z-10 absolute top-50 left-7  rounded-lg px-2 " + `text-${color}`
+              "z-10 absolute top-50 left-7 rounded-lg px-2 " + `text-${color}`
             }
           >
-            <span className="font-semibold text-2xl">{quantity + " "}</span>
+            <span className="font-semibold text-2xl ">{quantity + " "}</span>
             <span className="text-sm">in stock</span>
           </span>
         </div>
