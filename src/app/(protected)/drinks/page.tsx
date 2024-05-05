@@ -86,11 +86,13 @@ const DrinksPage = async () => {
   //   await new Promise((resolve) => setTimeout(resolve, 10000));
   return (
     <main className="min-h-screen">
-      <Navigator
-        username={session?.user.name}
-        greeting={greeting}
-        subtitle={subtitle}
-      ></Navigator>
+      <SessionProvider>
+        <Navigator
+          username={session?.user.name}
+          greeting={greeting}
+          subtitle={subtitle}
+        ></Navigator>
+      </SessionProvider>
       <div className="w-full flex flex-col gap-2 p-2">
         {drinks &&
           drinks.map((drink) => {

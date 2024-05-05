@@ -63,11 +63,13 @@ const StatsPage = async () => {
   );
   return (
     <main className="min-h-screen w-full">
-      <Navigator
-        username={session?.user.name}
-        greeting={"Stats for "}
-        subtitle={"Understand your patterns"}
-      ></Navigator>
+      <SessionProvider>
+        <Navigator
+          username={session?.user.name}
+          greeting={"Stats for "}
+          subtitle={"Understand your patterns"}
+        ></Navigator>
+      </SessionProvider>
       <MainStats
         totalSugar={statsTotal?.totalSugar}
         totalCaffein={statsTotal?.totalCaffeine}

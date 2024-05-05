@@ -16,11 +16,13 @@ const DashboardPage = async () => {
   //   await new Promise((resolve) => setTimeout(resolve, 10000));
   return (
     <main className="min-h-screen">
-      <Navigator
-        username={session?.user.name}
-        greeting={"Dashboard for "}
-        subtitle={"Manage your orders"}
-      ></Navigator>
+      <SessionProvider>
+        <Navigator
+          username={session?.user.name}
+          greeting={"Dashboard for "}
+          subtitle={"Manage your orders"}
+        ></Navigator>
+      </SessionProvider>
 
       <Receipt
         username={session?.user.name}

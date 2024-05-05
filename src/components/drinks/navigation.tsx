@@ -2,6 +2,7 @@
 import { logout } from "@/actions/logout";
 import { Button } from "@/components/ui/button";
 import { IoLogOutSharp } from "react-icons/io5";
+import { MdAdminPanelSettings } from "react-icons/md";
 import Link from "next/link";
 import {
   DropdownMenu,
@@ -23,13 +24,14 @@ interface NavigatorProps {
   greeting: string;
   subtitle?: string;
 }
-
+import { useSession } from "next-auth/react";
 export const Navigator = ({ username, greeting, subtitle }: NavigatorProps) => {
   const [open, setOpen] = useState(false);
   const onClick = () => {
     setOpen(!open);
     logout();
   };
+  const session = useSession();
   return (
     <nav className="my-5 w-[80vw] mx-auto h-20 bg-secondary text-secondary-foreground shadow-sm rounded-md flex items-center justify-between px-5">
       <div className="">
@@ -95,6 +97,20 @@ export const Navigator = ({ username, greeting, subtitle }: NavigatorProps) => {
               </Link>
             </Button>
           </DropdownMenuItem>
+          {session.data?.user?.role === "ADMIN" && (
+            <DropdownMenuItem>
+              <Button
+                className="w-full p-2 hover:bg-secondary-foreground hover:text-secondary"
+                variant={"secondary"}
+                asChild
+              >
+                <Link href="/admin" className="hover:scale-110">
+                  <MdAdminPanelSettings className="h-5 w-5 hover:scale-110" />
+                  <span className="ml-1">Admin</span>
+                </Link>
+              </Button>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem>
             <Button
