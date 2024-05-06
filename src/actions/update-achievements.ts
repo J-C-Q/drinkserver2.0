@@ -90,7 +90,7 @@ function checkLoyal(orders: Order[]){
 
 function checkNightOwl(orders: Order[]) {
     for (let order of orders) {
-        if (order.date.getHours() >= 23 && order.date.getHours() <= 4) {
+        if (order.date.getHours() >= 23 || order.date.getHours() <= 4) {
             return true;
         }
     }
