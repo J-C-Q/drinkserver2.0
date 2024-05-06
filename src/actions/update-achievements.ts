@@ -103,7 +103,11 @@ function checkNightOwl(orders: Order[]) {
 
 function checkEarlyBird(orders: Order[]) {
     for (let order of orders) {
-        if ((order.date.getHours() >= 6) && order.date.getHours() <= 7) {
+        if ((parseInt(order.date.toLocaleString("de-DE", {
+            hour: "2-digit",
+            timeZone: "Europe/Berlin"})) >= 6) && parseInt(order.date.toLocaleString("de-DE", {
+                hour: "2-digit",
+                timeZone: "Europe/Berlin"})) <= 7) {
             return true;
         }
     }
