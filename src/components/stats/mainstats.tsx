@@ -62,7 +62,7 @@ export const MainStats = (
             font.className
         )}
       >
-        {((sugarStats[pointer ?? 0] ?? 0) / 1000 ?? 0).toFixed(2)}
+        {((sugarStats[pointer ?? 0] ?? 0) / 1000).toFixed(2)}
 
         <div className="absolute text-sm left-[50%] translate-x-[-60px] top-[50%] translate-y-[-40px] text-gray-600 not-italic whitespace-nowrap">
           sugar
