@@ -29,7 +29,13 @@ export const getItemQuantity = async (itemid: string) => {
 
 export const getItems = async () => {
     try {
-        const items = await db.item.findMany();
+        const items = await db.item.findMany({
+            where: {
+                quantity: {
+                    not: 0
+                }
+            }
+        });
         return items;
     } catch {
         return null

@@ -26,3 +26,15 @@ export const getOrdersForUser = async (userId: string | undefined) => {
         return null
     }
 }
+
+export const getMoneySpendForUser = async (userId: string | undefined) => {
+    try {
+        const money = await db.order.aggregate({
+            _sum: { itemprice: true },
+            where: { userId }
+        });
+        return money._sum.itemprice;
+    } catch {
+        return null;
+    }
+}
