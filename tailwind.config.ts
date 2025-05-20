@@ -59,7 +59,6 @@ const config = {
             'weiss': '#FFFFFF',
             'hellrot': '#e85b5b',
             'orange': '#e9bb59'
-
       },
       borderRadius: {
         lg: "var(--radius)",
