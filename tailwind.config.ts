@@ -58,7 +58,10 @@ const config = {
             'schwarz': '#000000',
             'weiss': '#FFFFFF',
             'hellrot': '#e85b5b',
-            'orange': '#e9bb59'
+            'orange': '#e9bb59',
+            'blau': '#0A2258',
+            'gruen': '#A0A66F',
+            'pink': '#E1BCD4'
       },
       borderRadius: {
         lg: "var(--radius)",
