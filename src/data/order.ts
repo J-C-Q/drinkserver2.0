@@ -9,6 +9,15 @@ export const getPendingOrdersForUser = async (userid: string | undefined) => {
     }
 }
 
+export const getCompletedOrdersForUser = async (userid: string | undefined) => {
+    try {
+        const orders = await db.order.findMany({ where: { userId: userid, status: "COMPLETED"}, orderBy: { date: "desc" } });
+        return orders;
+    } catch {
+        return null
+    }
+}
+
 export const verifyPendingOrdersForUser = async (userid: string | undefined) => {
     try {
         await db.order.updateMany({ where: { userId: userid, status: "PENDING"}, data: { status: "COMPLETED" } });
@@ -32,6 +41,30 @@ export const getMoneySpendForUser = async (userId: string | undefined) => {
         const money = await db.order.aggregate({
             _sum: { itemprice: true },
             where: { userId }
+        });
+        return money._sum.itemprice;
+    } catch {
+        return null;
+    }
+}
+
+export const getTotalMoneyPending = async () => {
+    try {
+        const money = await db.order.aggregate({
+            _sum: { itemprice: true },
+            where: { status: "PENDING" }
+        });
+        return money._sum.itemprice;
+    } catch {
+        return null;
+    }
+}
+
+export const getTotalMoneyCompleted = async () => {
+    try {
+        const money = await db.order.aggregate({
+            _sum: { itemprice: true },
+            where: { status: "COMPLETED" }
         });
         return money._sum.itemprice;
     } catch {
