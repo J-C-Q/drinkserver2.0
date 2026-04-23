@@ -90,7 +90,11 @@ export const DrinkEntry = ({
     "bg-orange",
     "bg-blau",
     "bg-gruen",
-    "bg-pink"
+    "bg-pink",
+    "bg-lemonyellow",
+    "bg-naturelleblue",
+    "bg-rhodiuspink",
+    "bg-maracujaorange"
   ];
 
   const router = useRouter();
