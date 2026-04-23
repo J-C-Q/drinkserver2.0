@@ -61,7 +61,11 @@ const config = {
             'orange': '#e9bb59',
             'blau': '#0A2258',
             'gruen': '#A0A66F',
-            'pink': '#E1BCD4'
+            'pink': '#E1BCD4',
+            'lemonyellow': '#FEE506',
+            'naturelleblue': '#388ADB',
+            'rhodiuspink': '#BB3D84',
+            'maracujaorange': '#E98318'
       },
       borderRadius: {
         lg: "var(--radius)",
