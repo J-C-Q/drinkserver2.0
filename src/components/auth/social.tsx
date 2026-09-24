@@ -12,14 +12,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 export const Social = () => {
   const onClick = (provider: "google" | "github" | "apple") => {
-    const promise = () =>
-      signIn(provider, { callbackUrl: DEFAULT_LOGIN_REDIRECT });
-    toast.promise(promise, {
-      loading: `Loggin in ...`,
-      success: (data) => {
-        return `${provider} login successful!`;
-      },
-      error: "Error",
+    void signIn(provider, { callbackUrl: DEFAULT_LOGIN_REDIRECT }).catch(() => {
+      toast.error(`${provider} login failed. Please try again.`);
     });
   };
   return (
