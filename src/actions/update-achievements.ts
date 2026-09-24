@@ -320,6 +320,9 @@ function checkPhilanthropist(orders: Order[]) {
 }
 
 function checkMoreInAWeek(orders: Order[], itemname:string){
+    if (orders.length == 0) {
+        return false;
+    }
     let drinkThisWeek = 0;
     let notDrinkThisWeek = 0;
     let currentWeek = getWeek(orders[0].date);
