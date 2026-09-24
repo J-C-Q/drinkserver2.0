@@ -1,12 +1,10 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useSession } from "next-auth/react";
 
 import { toast } from "sonner";
 
-import { order } from "@/actions/order";
 import { clearPendingOrders } from "@/actions/clear-pending";
-import { use, useEffect, useState } from "react";
+import { useState } from "react";
 
 
 interface ClearPendingProps {
@@ -18,8 +16,12 @@ export const ClearPending = ({ userid }: ClearPendingProps) => {
   const handleClearPending = async () => {
     setLoading(true);
     try {
-      await clearPendingOrders(userid);
-      toast.success("Pending orders cleared successfully");
+      const result = await clearPendingOrders(userid);
+      if (result.success) {
+        toast.success(result.success);
+      } else {
+        toast.error(result.error);
+      }
     } catch (error) {
       toast.error("Failed to clear pending orders");
     } finally {

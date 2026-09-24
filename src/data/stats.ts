@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-export const getTotalSugarAndCaffeinOfUser = async (userId: string | undefined) => {
+export const getTotalSugarAndCaffeinOfUser = async (userId: string) => {
     try {
        const drinks = await db.order.findMany({ where: { userId } });
        const items = await db.item.findMany({ where: { itemid: { in: drinks.map((drink) => drink.itemid) } } });
@@ -32,7 +32,7 @@ export const getTotalSugarAndCaffeinOfUser = async (userId: string | undefined) 
     }
 }
 
-export const getTodaySugarAndCaffeinOfUser = async (userId: string | undefined) => {
+export const getTodaySugarAndCaffeinOfUser = async (userId: string) => {
     try {
         const drinks = await db.order.findMany({ where: { userId, date: { gte: new Date(new Date().setHours(0, 0, 0, 0))}}});
         const items = await db.item.findMany({ where: { itemid: { in: drinks.map((drink) => drink.itemid) } } });
@@ -63,7 +63,7 @@ export const getTodaySugarAndCaffeinOfUser = async (userId: string | undefined) 
     }
 }
 
-export const getLastWeekSugarAndCaffeinOfUser = async (userId: string | undefined) => {
+export const getLastWeekSugarAndCaffeinOfUser = async (userId: string) => {
     try {
         const drinks = await db.order.findMany({ where: { userId, date: { gte: new Date(new Date().setDate(new Date().getDate() - 7)) } } });
         const items = await db.item.findMany({ where: { itemid: { in: drinks.map((drink) => drink.itemid) } } });
@@ -94,7 +94,7 @@ export const getLastWeekSugarAndCaffeinOfUser = async (userId: string | undefine
     }
 }
 
-export const getLastMonthSugarAndCaffeinOfUser = async (userId: string | undefined) => {
+export const getLastMonthSugarAndCaffeinOfUser = async (userId: string) => {
     try {
         const drinks = await db.order.findMany({ where: { userId, date: { gte: new Date(new Date().setMonth(new Date().getMonth() - 1)) } } });
         const items = await db.item.findMany({ where: { itemid: { in: drinks.map((drink) => drink.itemid) } } });

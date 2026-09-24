@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+import { currentUser } from "@/lib/auth-guard";
 import { NextResponse } from 'next/server';
 
 import {authorizeUser, unAuthorizeUser} from "@/data/user";
@@ -9,9 +9,9 @@ export async function GET(request: Request) {
   const authorize = searchParams.get('authorize');
 
  
-  const session = await auth();
+  const user = await currentUser();
 
-  if (!session) {
+  if (!user) {
     return NextResponse.json({error: "Not logged in!", code: 401});
   }
 
@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     return NextResponse.json({error: "Missing parameters!", code: 400});
   }
 
-  if(session.user.role !== "ADMIN") {
+  if(user.role !== "ADMIN") {
     return NextResponse.json({error: "You are not authorized to perform this action!", code: 403});
   }
 

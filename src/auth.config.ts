@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import type { NextAuthConfig } from "next-auth";
+import type { UserRole } from "@prisma/client";
 import Credentials from "next-auth/providers/credentials";
 import Github from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
@@ -44,4 +45,16 @@ export default {
 }}
   )
 ],
+  callbacks: {
+    // Shared with the middleware so req.auth carries the user id and role.
+    session({ session, token }) {
+      if (token.sub && session.user) {
+        session.user.id = token.sub;
+      }
+      if (token.role && session.user) {
+        session.user.role = token.role as UserRole;
+      }
+      return session;
+    },
+  },
 } satisfies NextAuthConfig

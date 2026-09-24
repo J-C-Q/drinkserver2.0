@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 
-export const getPendingOrdersForUser = async (userid: string | undefined) => {
+export const getPendingOrdersForUser = async (userid: string) => {
     try {
         const orders = await db.order.findMany({ where: { userId: userid, status: "PENDING"}, orderBy: { date: "desc" } });
         return orders;
@@ -9,7 +9,7 @@ export const getPendingOrdersForUser = async (userid: string | undefined) => {
     }
 }
 
-export const getCompletedOrdersForUser = async (userid: string | undefined) => {
+export const getCompletedOrdersForUser = async (userid: string) => {
     try {
         const orders = await db.order.findMany({ where: { userId: userid, status: "COMPLETED"}, orderBy: { date: "desc" } });
         return orders;
@@ -18,7 +18,11 @@ export const getCompletedOrdersForUser = async (userid: string | undefined) => {
     }
 }
 
-export const verifyPendingOrdersForUser = async (userid: string | undefined) => {
+export const verifyPendingOrdersForUser = async (userid: string) => {
+    // An undefined userId would drop the filter and complete every user's orders.
+    if (typeof userid !== "string" || userid === "") {
+        return false;
+    }
     try {
         await db.order.updateMany({ where: { userId: userid, status: "PENDING"}, data: { status: "COMPLETED" } });
         return true;
@@ -27,7 +31,7 @@ export const verifyPendingOrdersForUser = async (userid: string | undefined) => 
     }
 }
 
-export const getOrdersForUser = async (userId: string | undefined) => {
+export const getOrdersForUser = async (userId: string) => {
     try {
         const dates = await db.order.findMany({select: {date: true, itemname: true}, where: {userId}});
         return dates;
@@ -36,7 +40,7 @@ export const getOrdersForUser = async (userId: string | undefined) => {
     }
 }
 
-export const getMoneySpendForUser = async (userId: string | undefined) => {
+export const getMoneySpendForUser = async (userId: string) => {
     try {
         const money = await db.order.aggregate({
             _sum: { itemprice: true },

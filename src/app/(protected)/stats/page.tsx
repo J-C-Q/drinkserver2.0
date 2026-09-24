@@ -1,4 +1,5 @@
-import { auth, signOut } from "@/auth";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 import { getItems } from "@/data/item";
 import { DrinkEntry } from "@/components/drinks/drink-entry";
 import { SessionProvider } from "next-auth/react";
@@ -36,30 +37,34 @@ type WeeklyBuckets = { [day in WeekDays]: HourlyBuckets };
 
 const StatsPage = async () => {
   const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) {
+    redirect("/auth/login");
+  }
 
   // do async stuff for 30 seconds
   //   await new Promise((resolve) => setTimeout(resolve, 10000));
-  const data = await getOrdersForUser(session?.user.id);
+  const data = await getOrdersForUser(userId);
   const buckets = initializeBuckets();
   if (data) {
     addToBuckets(data, buckets);
   }
-  await updateAchievements(session?.user.id);
+  await updateAchievements();
   const achievements = (await getAchievementsOfUser(
-    session?.user.id
+    userId
   )) as Achievement[];
 
   const openAchievements = (await getAchievementsUserDoesntHave(
-    session?.user.id
+    userId
   )) as Achievement[];
 
-  const statsTotal = await getTotalSugarAndCaffeinOfUser(session?.user.id);
-  const statsToday = await getTodaySugarAndCaffeinOfUser(session?.user.id);
+  const statsTotal = await getTotalSugarAndCaffeinOfUser(userId);
+  const statsToday = await getTodaySugarAndCaffeinOfUser(userId);
   const statsLastWeek = await getLastWeekSugarAndCaffeinOfUser(
-    session?.user.id
+    userId
   );
   const statsLastMonth = await getLastMonthSugarAndCaffeinOfUser(
-    session?.user.id
+    userId
   );
   return (
     <main className="min-h-screen w-full">

@@ -24,6 +24,7 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
+    ...authConfig,
     pages: {
         signIn: "/auth/login",
         error: "/auth/error",
@@ -38,6 +39,7 @@ export const {
     },
     session: { strategy: "jwt" },
     callbacks: {
+        ...authConfig.callbacks,
         async signIn( {user, account}) {
             // Allow OAuth without email verification
             if (account?.provider != "credentials") {
@@ -54,16 +56,6 @@ export const {
 
             return true;
         },
-        // @ts-ignore
-        async session({session, token}) {
-            if (token.sub && session.user) {
-                session.user.id = token.sub;
-            }
-            if (token.role && session.user) {
-                session.user.role = token.role as UserRole;
-            }
-            return session;
-        },
         async jwt({token}) {
             if(!token.sub) {
                 return token;
@@ -78,5 +70,4 @@ export const {
         }
     },
     adapter: PrismaAdapter(db),
-  ...authConfig,
 })

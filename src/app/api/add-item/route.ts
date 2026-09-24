@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+import { currentUser } from "@/lib/auth-guard";
 import { NextResponse } from 'next/server';
 import {item} from "@/actions/item";
  
@@ -8,13 +8,13 @@ export async function GET(request: Request) {
   const itemprice = searchParams.get('itemPrice');
   const quantity = searchParams.get('quantity');
  
-  const session = await auth();
+  const user = await currentUser();
 
-  if (!session) {
+  if (!user) {
     return NextResponse.json({error: "Not logged in!", code: 401});
   }
 
-  if(session.user.role !== "ADMIN") {
+  if(user.role !== "ADMIN") {
     return NextResponse.json({error: "You are not authorized to perform this action!", code: 403});
   }
 

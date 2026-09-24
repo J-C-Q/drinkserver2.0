@@ -38,7 +38,7 @@ export const unAuthorizeUser = async (id: string) => {
 
 export const getAllUsers = async () => {
     try {
-        const users = await db.user.findMany();
+        const users = await db.user.findMany({ select: { id: true, name: true } });
         return users;
     } catch {
         return null

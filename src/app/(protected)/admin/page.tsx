@@ -1,20 +1,25 @@
-import { auth, signOut } from "@/auth";
+import { redirect } from "next/navigation";
 import { SessionProvider } from "next-auth/react";
 import { Navigator } from "@/components/drinks/navigation";
 import { getAllUsers } from "@/data/user";
 import { getPendingOrdersForUser } from "@/data/order";
 import { getCompletedOrdersForUser } from "@/data/order";
-import {getTotalMoneyPending, getTotalMoneyCompleted,verifyPendingOrdersForUser} from "@/data/order";
+import {getTotalMoneyPending, getTotalMoneyCompleted} from "@/data/order";
 import { ClearPending } from "@/components/admin/clear-pending";
+import { currentAdmin } from "@/lib/auth-guard";
+import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 
 const AdminPage = async () => {
-  const session = await auth();
+  const admin = await currentAdmin();
+  if (!admin) {
+    redirect(DEFAULT_LOGIN_REDIRECT);
+  }
   const users = await getAllUsers();
   return (
     <main className="min-h-screen w-full">
       <SessionProvider>
         <Navigator
-          username={session?.user.name}
+          username={admin.name}
           greeting={"Admin "}
           subtitle={"Manage the service"}
         ></Navigator>

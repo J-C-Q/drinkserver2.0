@@ -5,8 +5,15 @@ import { addAchievementToUser, getAllAchievements } from "@/data/achievements";
 import { getAchievementsOfUser } from "@/data/achievements";
 import { Achievement, Item } from '@prisma/client'
 import { getItems } from "@/data/item";
+import { currentUser } from "@/lib/auth-guard";
 
-export const updateAchievements = async (userid: string | undefined) => {
+// Always updates the session user's achievements.
+export const updateAchievements = async () => {
+    const user = await currentUser();
+    if (!user) {
+        return { error: "Not logged in!", code: 401 };
+    }
+    const userid = user.id;
 
     const orders = await getOrdersForUser(userid);
     const items = await getItems();

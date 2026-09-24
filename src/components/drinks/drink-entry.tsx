@@ -199,7 +199,7 @@ export const DrinkEntry = ({
               variant="outline"
               onClick={() => {
                 if (userid) {
-                  const promise = () => order(drinkid, userid);
+                  const promise = () => order(drinkid);
                   toast.promise(promise, {
                     loading: `Processing order ...`,
                     success: (data) => {

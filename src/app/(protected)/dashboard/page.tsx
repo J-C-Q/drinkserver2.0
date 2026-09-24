@@ -1,4 +1,5 @@
-import { auth, signOut } from "@/auth";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 import { getItems } from "@/data/item";
 import { DrinkEntry } from "@/components/drinks/drink-entry";
 import { SessionProvider } from "next-auth/react";
@@ -11,7 +12,11 @@ import { Receipt } from "@/components/drinks/receipt";
 
 const DashboardPage = async () => {
   const session = await auth();
-  const orders = await getPendingOrdersForUser(session?.user.id);
+  const userId = session?.user?.id;
+  if (!userId) {
+    redirect("/auth/login");
+  }
+  const orders = await getPendingOrdersForUser(userId);
   // do async stuff for 30 seconds
   //   await new Promise((resolve) => setTimeout(resolve, 10000));
   return (
@@ -26,7 +31,7 @@ const DashboardPage = async () => {
 
       <Receipt
         username={session?.user.name}
-        userid={session?.user.id}
+        userid={userId}
         orders={orders}
       />
       <OrderTable orders={orders} />
