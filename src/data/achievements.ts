@@ -38,7 +38,12 @@ export const getAchievementsUserDoesntHave = async (userid: string) => {
 
 export const addAchievementToUser = async (userid: string, achievementid: string) => {
     try {
-        await db.user.update({ where: { id: userid }, data: { achievements: { push: achievementid } } });
+        // One conditional statement, so concurrent award runs cannot both
+        // append the same id.
+        await db.$executeRaw`
+            UPDATE "User"
+            SET "achievements" = array_append("achievements", ${achievementid}::text)
+            WHERE "id" = ${userid} AND NOT (${achievementid}::text = ANY("achievements"))`;
         return true;
     } catch {
         return false

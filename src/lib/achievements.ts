@@ -6,21 +6,28 @@ import { getAllItems } from "@/data/item";
 import { berlinDay, berlinWeek } from "@/lib/berlin-time";
 
 // Awards every achievement the user's order history now qualifies for.
-// Evaluated from the full history each time, so an award that failed to save
-// is picked up again after the next order. Not a server action: only called
-// from server code with an already-authenticated user id.
+// Evaluated from the full history each time, so it is safe to repeat: it runs
+// after each order and daily for everyone (/api/cron/achievements), which
+// catches awards whose first attempt failed. Not a server action: only called
+// from server code with a user id the caller has already authenticated.
 export const awardAchievements = async (userid: string) => {
 
-    const orders = await getOrdersForUser(userid);
-    const items = await getAllItems();
     const possibleAchievements = await getAllAchievements();
     const achievements = await getAchievementsOfUser(userid)
-
-
-    if (orders == null || items == null || possibleAchievements == null || achievements == null) {
+    if (possibleAchievements == null || achievements == null) {
         throw new Error("could not load achievement data");
     }
     const achievementIds = achievements.map((achievement: Achievement) => achievement.id);
+    // Nothing left to award: skip reading the order history.
+    if (possibleAchievements.every((achievement) => achievementIds.includes(achievement.id))) {
+        return;
+    }
+
+    const orders = await getOrdersForUser(userid);
+    const items = await getAllItems();
+    if (orders == null || items == null) {
+        throw new Error("could not load achievement data");
+    }
     for (let achievement in possibleAchievements) {
         // if(!(achievements.includes(possibleAchievements[achievement]))) {
         // check if the user has the required orders	

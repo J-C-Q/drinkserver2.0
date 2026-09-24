@@ -15,6 +15,9 @@ export const authRoutes = [
 
 export const apiAuthPrefix = "/api/auth";
 
+// Cron routes authenticate with CRON_SECRET themselves, not with a session.
+export const cronPrefix = "/api/cron/";
+
 export const adminPrefix = "/admin";
 
 export const DEFAULT_LOGIN_REDIRECT = "/drinks";

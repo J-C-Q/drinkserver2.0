@@ -1,6 +1,6 @@
 import NextAuth from "next-auth"
 import authConfig from "@/auth.config"
-import {DEFAULT_LOGIN_REDIRECT, adminPrefix, apiAuthPrefix, authRoutes, pubicRoutes} from "@/routes";
+import {DEFAULT_LOGIN_REDIRECT, adminPrefix, apiAuthPrefix, authRoutes, cronPrefix, pubicRoutes} from "@/routes";
 
 const { auth } = NextAuth(authConfig);
 
@@ -16,7 +16,7 @@ export default auth((req) => {
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
   const isAdminRoute = nextUrl.pathname === adminPrefix || nextUrl.pathname.startsWith(`${adminPrefix}/`);
 
-    if (isApiAuthRoute) {
+    if (isApiAuthRoute || nextUrl.pathname.startsWith(cronPrefix)) {
         return void 0;
     }
 

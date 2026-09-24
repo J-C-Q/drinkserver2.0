@@ -1,0 +1,5 @@
+{
+  "crons": [
+    { "path": "/api/cron/achievements", "schedule": "0 3 * * *" }
+  ]
+}
