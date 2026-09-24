@@ -1,6 +1,7 @@
 "use server";
 
 import * as z from "zod";
+import bcrypt from "bcryptjs";
 import { AuthError } from "next-auth";
 
 import {signIn} from "@/auth";
@@ -20,13 +21,22 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
 
     const existingUser = await getUserByEmail(email);
 
+    // Same answer for unknown accounts and wrong passwords.
     if (!existingUser || !existingUser.email || !existingUser.password) {
-        return {error: "Email does not exist!"};
+        return {error: "Invalid email or password!"};
     }
 
     if(!existingUser.emailVerified) {
+        // Only resend verification mail to someone who knows the password.
+        const passwordMatch = await bcrypt.compare(password, existingUser.password);
+        if (!passwordMatch) {
+            return {error: "Invalid email or password!"};
+        }
         const verificationToken = await generateVerificationToken(existingUser.email);
-        await sendVerificationEmail(verificationToken.email, verificationToken.token);
+        const sent = await sendVerificationEmail(verificationToken.email, verificationToken.token);
+        if (!sent) {
+            return {error: "Could not send the confirmation email, please try again later."};
+        }
         return {success: "Confirmation email sent!"}
     }
 

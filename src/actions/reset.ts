@@ -7,7 +7,9 @@ import { getUserByEmail } from "@/data/user";
 import { sendPasswordResetEmail } from "@/lib/mail";
 import { generatePasswordResetToken } from "@/lib/tokens";
 
-export const reset = async (values: z.infer<typeof ResetSchema>) => {
+type ResetResult = {success?: string; error?: string; code: number};
+
+export const reset = async (values: z.infer<typeof ResetSchema>): Promise<ResetResult> => {
     const validatedFields = ResetSchema.safeParse(values);
     if(!validatedFields.success) {
         return {error: "Invalid email!", code: 400};
@@ -17,11 +19,14 @@ export const reset = async (values: z.infer<typeof ResetSchema>) => {
 
     const existingUser = await getUserByEmail(email);
 
+    // The response must not reveal whether an account exists.
+    const response: ResetResult = {success: "If an account exists for this email, a reset link has been sent.", code: 200};
+
     if(!existingUser) {
-        return {error: "Email not found!", code: 404};
+        return response;
     }
 
     const passwordResetToken = await generatePasswordResetToken(email);
     await sendPasswordResetEmail(passwordResetToken.email, passwordResetToken.token);
-    return {success: "Email sent!", code: 200};
+    return response;
 };

@@ -38,16 +38,25 @@ export const newPassword = async (values: z.infer<typeof NewPasswordSchema>,toke
 
     const hashedPassword = await bcrypt.hash(password,10);
 
-    await db.user.update({
-        where: {id: existingUser.id},
-        data: {password: hashedPassword}
+    // Consume the token and change the password together; the conditional
+    // delete lets only one of several concurrent submissions through.
+    const updated = await db.$transaction(async (tx) => {
+        const consumed = await tx.passwordResetToken.deleteMany({
+            where: {id: existingToken.id, expires: {gt: new Date()}}
+        });
+        if (consumed.count === 0) {
+            return false;
+        }
+        await tx.user.update({
+            where: {id: existingUser.id},
+            data: {password: hashedPassword}
+        });
+        return true;
     });
 
-    await db.passwordResetToken.delete({
-        where: {id: existingToken.id}
-    });
+    if(!updated) {
+        return {error: "Invalid token!", code: 404};
+    }
 
     return {success: "Password updated!", code: 200};
-
-
 };

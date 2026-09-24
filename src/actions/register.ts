@@ -35,8 +35,10 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     });
 
     const verificationToken = await generateVerificationToken(email);
-    await sendVerificationEmail(verificationToken.email, verificationToken.token);
-
+    const sent = await sendVerificationEmail(verificationToken.email, verificationToken.token);
+    if (!sent) {
+        return { error: "Account created, but the confirmation email could not be sent. Log in to resend it.", code: 500 };
+    }
 
     return { success: "Confirmation email sent!", code: 200 }
 };
