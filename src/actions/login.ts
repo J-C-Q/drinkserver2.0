@@ -20,18 +20,21 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
         return {error: "Invalid fields!"};
     }
     const {email,password} = validatedFields.data;
+    const ip = clientIp(await headers());
+
+    // Bounds the account lookups below per address.
+    if (!(await rateLimit(`login-lookup:ip:${ip}`, 100, 15 * 60))) {
+        return {error: "Too many attempts, please try again later."};
+    }
 
     const existingUser = await getUserByEmail(email);
 
-    // Same answer for unknown accounts and wrong passwords.
-    if (!existingUser || !existingUser.email || !existingUser.password) {
-        return {error: "Invalid email or password!"};
-    }
-
-    if(!existingUser.emailVerified) {
-        // This branch checks the password itself, without the credentials
-        // provider, so it applies the same attempt limit first.
-        if (!(await loginAttemptAllowed(email, clientIp(await headers())))) {
+    // Unverified accounts are the only case handled here: this branch checks
+    // the password itself, so it applies the credentials provider's attempt
+    // limit first. Every other case, including unknown addresses, goes through
+    // signIn below, which limits and answers them all the same way.
+    if (existingUser?.email && existingUser.password && !existingUser.emailVerified) {
+        if (!(await loginAttemptAllowed(email, ip))) {
             return {error: "Too many attempts, please try again later."};
         }
         // Only resend verification mail to someone who knows the password.

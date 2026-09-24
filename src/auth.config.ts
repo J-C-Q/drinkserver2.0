@@ -9,6 +9,10 @@ import {LoginSchema} from "@/schemas";
 import {getUserByEmail} from "@/data/user";
 import { clientIp, loginAttemptAllowed } from "@/lib/rate-limit";
 
+// Hash of a random, discarded password. Compared against for unknown
+// accounts so they take as long as a wrong password for a real one.
+const TIMING_DUMMY_HASH = "$2a$10$5pJAVfwAo2z9iDYC2CkU1.NlKa7pjJXbsP7dyfy8iyDLjeoqc9M1i";
+
 // Lets the login form tell "too many attempts" apart from a wrong password.
 export class RateLimitedSignin extends CredentialsSignin {
   code = "rate_limited";
@@ -45,6 +49,7 @@ export default {
 
       const user = await getUserByEmail(email);
       if(!user || !user.password) {
+        await bcrypt.compare(password, TIMING_DUMMY_HASH);
         return null;
       }
 
