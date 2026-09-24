@@ -1,47 +1,53 @@
 import { db } from "@/lib/db";
-import { startOfBerlinDay } from "@/lib/berlin-time";
+import { oneMonthEarlier, startOfBerlinDay } from "@/lib/berlin-time";
 
 type SugarAndCaffeine = { sugar: number; caffeine: number };
 
-// Loads the user's non-cancelled orders once and sums sugar and caffeine for
-// all time windows shown on the stats page, using the values stored on each
-// order at purchase time. "Today" is the Berlin calendar day; week and month
-// are the rolling last 7 days and last month.
+// Sums sugar and caffeine in the database for the time windows shown on the
+// stats page, using the values stored on each order at purchase time.
+// "Today" is the Berlin calendar day; week and month are the rolling last
+// 7 days and last calendar month.
 export const getSugarAndCaffeinStatsOfUser = async (userId: string) => {
     try {
-        const orders = await db.order.findMany({
-            where: { userId, status: { not: "CANCELLED" } },
-            select: { date: true, sugar: true, caffeine: true },
-        });
-
         const now = new Date();
-        const startOfToday = startOfBerlinDay(now);
-        const lastWeek = new Date(now);
-        lastWeek.setDate(now.getDate() - 7);
-        const lastMonth = new Date(now);
-        lastMonth.setMonth(now.getMonth() - 1);
-
-        const sumSince = (since?: Date): SugarAndCaffeine => {
-            let sugar = 0;
-            let caffeine = 0;
-            for (const order of orders) {
-                if (since && order.date < since) {
-                    continue;
-                }
-                sugar += order.sugar ?? 0;
-                caffeine += order.caffeine ?? 0;
-            }
-            return { sugar, caffeine };
+        const sumSince = async (since?: Date): Promise<SugarAndCaffeine> => {
+            const result = await db.order.aggregate({
+                where: { userId, status: { not: "CANCELLED" }, ...(since ? { date: { gte: since } } : {}) },
+                _sum: { sugar: true, caffeine: true },
+            });
+            return { sugar: result._sum.sugar ?? 0, caffeine: result._sum.caffeine ?? 0 };
         };
 
-        return {
-            total: sumSince(),
-            today: sumSince(startOfToday),
-            lastWeek: sumSince(lastWeek),
-            lastMonth: sumSince(lastMonth),
-        };
+        const [total, today, lastWeek, lastMonth] = await Promise.all([
+            sumSince(),
+            sumSince(startOfBerlinDay(now)),
+            sumSince(new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)),
+            sumSince(oneMonthEarlier(now)),
+        ]);
+        return { total, today, lastWeek, lastMonth };
     } catch (error) {
         console.error("[stats] could not load nutrition stats:", error);
+        return null;
+    }
+};
+
+// Number of orders per Berlin weekday (0 = Sunday) and hour, counted in the
+// database instead of loading the whole history.
+export const getOrderHeatmapOfUser = async (userId: string) => {
+    try {
+        // "date" holds UTC; the first AT TIME ZONE marks it as UTC, the second
+        // converts to Berlin wall-clock time, independent of the session's
+        // time zone.
+        return await db.$queryRaw<{ dow: number; hour: number; count: number }[]>`
+            SELECT EXTRACT(DOW FROM berlin)::int AS dow, EXTRACT(HOUR FROM berlin)::int AS hour, COUNT(*)::int AS count
+            FROM (
+                SELECT ("date" AT TIME ZONE 'UTC') AT TIME ZONE 'Europe/Berlin' AS berlin
+                FROM "Order"
+                WHERE "userId" = ${userId} AND "status" <> 'CANCELLED'
+            ) AS orders
+            GROUP BY 1, 2`;
+    } catch (error) {
+        console.error("[stats] could not load heatmap:", error);
         return null;
     }
 };

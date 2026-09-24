@@ -34,3 +34,16 @@ export function startOfBerlinDay(date: Date) {
     const midnightUtc = Date.parse(berlinDay(date) + "T00:00:00Z");
     return new Date(midnightUtc - berlinOffset(midnightUtc));
 }
+
+// The same moment one calendar month earlier, with the day clamped to the
+// length of that month: 31 March -> 28/29 February, not 3 March.
+export function oneMonthEarlier(date: Date) {
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth() - 1;
+    const daysInTarget = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+    const result = new Date(date);
+    result.setUTCDate(1);
+    result.setUTCMonth(month);
+    result.setUTCDate(Math.min(date.getUTCDate(), daysInTarget));
+    return result;
+}

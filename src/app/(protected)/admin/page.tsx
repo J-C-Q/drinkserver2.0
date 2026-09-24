@@ -41,10 +41,10 @@ const AdminPage = async () => {
         <h1 className="text-2xl font-bold">Total</h1>
         <div className="p-2 border rounded">
           <p className="text-lg font-semibold">
-            Total Pending Money: {totalPending === null ? "?" : formatCents(totalPending)}
+            Total Pending Money: {totalPending === null ? "?" : `${formatCents(totalPending)}€`}
           </p>
           <p className="text-lg font-semibold">
-            Total Completed Money: {totalCompleted === null ? "?" : formatCents(totalCompleted)}
+            Total Completed Money: {totalCompleted === null ? "?" : `${formatCents(totalCompleted)}€`}
           </p>
         </div>
 
@@ -59,9 +59,9 @@ const AdminPage = async () => {
             <div key={user.id} className="p-2 border rounded">
                 <p>{user.name} ({user.id})</p>
                 <p>Orders pending: {totals?.pendingCount ?? 0}</p>
-                <p>Pending amount: ${formatCents(totals?.pendingCents ?? 0)}</p>
+                <p>Pending amount: {formatCents(totals?.pendingCents ?? 0)}€</p>
                 <p>Orders completed: {totals?.completedCount ?? 0}</p>
-                <p>Completed amount: ${formatCents(totals?.completedCents ?? 0)}</p>
+                <p>Completed amount: {formatCents(totals?.completedCents ?? 0)}€</p>
                 {totals?.pendingLatest && (
                   <RecordPayment
                     // Remount with fresh defaults when the pending orders change.
@@ -84,7 +84,7 @@ const AdminPage = async () => {
         {payments && payments.map((payment) => (
           <div key={payment.id} className="p-2 border rounded text-sm">
             <p>
-              {payment.createdAt.toLocaleString("de-DE", { timeZone: "Europe/Berlin" })}: {payment.user.name} paid {formatCents(payment.amountCents)} for {payment._count.orders} order{payment._count.orders === 1 ? "" : "s"} ({formatCents(payment.ordersCents)})
+              {payment.createdAt.toLocaleString("de-DE", { timeZone: "Europe/Berlin" })}: {payment.user.name} paid {formatCents(payment.amountCents)}€ for {payment._count.orders} order{payment._count.orders === 1 ? "" : "s"} ({formatCents(payment.ordersCents)}€)
             </p>
             <p className="text-gray-400">
               Confirmed by {payment.confirmedBy.name}{payment.reference ? ` · Ref: ${payment.reference}` : ""}
