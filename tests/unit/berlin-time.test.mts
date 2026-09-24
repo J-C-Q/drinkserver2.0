@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { berlinDay, berlinWeek, startOfBerlinDay } from "../../src/lib/berlin-time.ts";
+import { berlinDay, berlinWeek, oneMonthEarlier, startOfBerlinDay } from "../../src/lib/berlin-time.ts";
 
 const iso = (date: Date) => date.toISOString();
 
@@ -34,4 +34,18 @@ test("berlinWeek: Monday-based and distinct across years", () => {
     // Wednesday 31 Dec and Thursday 1 Jan share a week.
     assert.equal(berlinWeek(new Date("2025-12-31T12:00:00Z")), berlinWeek(new Date("2026-01-01T12:00:00Z")));
     assert.notEqual(berlinWeek(new Date("2025-01-15T12:00:00Z")), berlinWeek(new Date("2026-01-14T12:00:00Z")));
+});
+
+test("oneMonthEarlier clamps to the end of shorter months", () => {
+    assert.equal(iso(oneMonthEarlier(new Date("2026-03-31T10:00:00Z"))), "2026-02-28T10:00:00.000Z");
+    assert.equal(iso(oneMonthEarlier(new Date("2028-03-31T10:00:00Z"))), "2028-02-29T10:00:00.000Z");
+    assert.equal(iso(oneMonthEarlier(new Date("2026-05-31T23:59:59Z"))), "2026-04-30T23:59:59.000Z");
+    assert.equal(iso(oneMonthEarlier(new Date("2026-03-30T00:00:00Z"))), "2026-02-28T00:00:00.000Z");
+});
+
+test("oneMonthEarlier keeps the day when it exists and crosses years", () => {
+    assert.equal(iso(oneMonthEarlier(new Date("2026-09-24T12:34:56Z"))), "2026-08-24T12:34:56.000Z");
+    assert.equal(iso(oneMonthEarlier(new Date("2026-01-15T08:00:00Z"))), "2025-12-15T08:00:00.000Z");
+    assert.equal(iso(oneMonthEarlier(new Date("2026-01-31T08:00:00Z"))), "2025-12-31T08:00:00.000Z");
+    assert.equal(iso(oneMonthEarlier(new Date("2026-02-28T08:00:00Z"))), "2026-01-28T08:00:00.000Z");
 });

@@ -27,7 +27,7 @@ run(){ "$PSQL" "$1" -q -v ON_ERROR_STOP=1 "${@:2}"; }
 # Legacy rows as the old schema stored them: float euros, plaintext tokens.
 LEGACY_DATA=$(cat <<'SQL'
 insert into "User"(id,name,email,"emailVerified",authorized,password,role,achievements)
-  values ('u1','Alice','a@test.local',now(),true,'x','USER','{}'),
+  values ('u1','Alice','a@test.local',now(),true,'x','USER','{ach-b,ach-a,ach-b,ach-c,ach-a}'),
          ('u2','Bob','b@test.local',now(),true,'x','ADMIN','{}');
 insert into "Item"(itemid,itemname,itemprice,quantity,sugar,caffeine)
   values ('i1','Mate',1.5,10,25,100), ('i2','Old Cola',0.9371,0,33,null);
@@ -56,6 +56,7 @@ check "old price columns gone"   "$(q "select count(*) from information_schema.c
 check "plaintext tokens removed" "$(q 'select (select count(*) from "VerificationToken") + (select count(*) from "PasswordResetToken")')" "0"
 check "token columns hashed"     "$(q "select string_agg(table_name||'.'||column_name, ',' order by table_name) from information_schema.columns where column_name in ('token','tokenHash')")" "PasswordResetToken.tokenHash,VerificationToken.tokenHash"
 check "nutrition backfilled from items" "$(q "select string_agg(\"orderId\"||'='||coalesce(sugar::text,'-')||'/'||coalesce(caffeine::text,'-'), ',' order by \"orderId\") from \"Order\"")" "o1=25/100,o2=33/-,o3=33/-,o4=25/100"
+check "duplicate achievements removed, order kept" "$(q "select achievements from \"User\" where id='u1'")" "{ach-b,ach-a,ach-c}"
 check "statuses unchanged"       "$(q "select string_agg(status::text, ',' order by \"orderId\") from \"Order\"")" "PENDING,COMPLETED,COMPLETED,PENDING"
 check "foreign keys exist"       "$(q "select string_agg(conname, ',' order by conname) from pg_constraint where contype='f' and conrelid in ('\"Order\"'::regclass, '\"Payment\"'::regclass)")" "Order_itemid_fkey,Order_paymentId_fkey,Order_userId_fkey,Payment_confirmedById_fkey,Payment_userId_fkey"
 check "user with orders can't be deleted" "$(q "delete from \"User\" where id='u1'" 2>&1)" "Order_userId_fkey"

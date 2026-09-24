@@ -46,6 +46,7 @@ jobs:
       AUTH_SECRET: ci-only-secret-for-the-throwaway-test-database
       AUTH_TRUST_HOST: "true"
       NEXT_PUBLIC_APP_URL: http://localhost:3000
+      CRON_SECRET: ci-only-cron-secret
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

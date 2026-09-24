@@ -6,7 +6,8 @@
 # Start the app first (npm run dev, or npm run build && npm start) with the
 # same DATABASE_URL. The script DELETES all orders, payments and rate-limit
 # counters and reseeds the test data, so it refuses non-local databases.
-# Options: BASE_URL (default http://localhost:3000), PSQL (default psql).
+# Options: BASE_URL (default http://localhost:3000), PSQL (default psql),
+# CRON_SECRET (the app's value; without it the authorized cron checks are skipped).
 set -uo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 B="${BASE_URL:-http://localhost:3000}"
@@ -91,6 +92,12 @@ check "order stores nutrition"   "$(q "select string_agg(distinct o.sugar||'/'||
 awarded=f; for _ in $(seq 1 20); do [[ "$(q "select coalesce(array_length(achievements,1),0) > 0 from \"User\" where id='$U1'")" == t ]] && { awarded=t; break; }; sleep 0.5; done
 check "achievement awarded after purchase" "$awarded" "t"
 check "user2 orders Fritz"       "$(actr user2.jar /drinks "$ORDER" "[\"$FRITZ\"]")" "Second User ordered"
+# Concurrent orders start concurrent award runs; each achievement may be stored once.
+for i in 1 2 3 4 5; do actr user2.jar /drinks "$ORDER" "[\"$CLUB\"]" > /dev/null & done; wait
+junkie=f; for _ in $(seq 1 20); do [[ "$(q "select exists(select 1 from \"User\" u join \"Achievement\" a on a.id = any(u.achievements) where u.id='$U2' and a.name='Junkie')")" == t ]] && { junkie=t; break; }; sleep 0.5; done
+check "concurrent awards: Junkie awarded" "$junkie" "t"
+sleep 1
+check "concurrent awards: no duplicate ids" "$(q "select cardinality(achievements) = (select count(distinct a) from unnest(achievements) a) from \"User\" where id='$U2'")" "t"
 # Race: 10 concurrent orders for the last item in stock.
 for i in 1 2 3 4 5; do actr user.jar /drinks "$ORDER" "[\"$LAST\"]" > "$T/r_u$i" & actr user2.jar /drinks "$ORDER" "[\"$LAST\"]" > "$T/r_v$i" & done; wait
 check "race: 1 success"          "$(cat "$T"/r_* | grep -o 'ordered Last One' | wc -l | tr -d ' ')" "1"
@@ -136,6 +143,8 @@ check "user2 orders untouched"   "$(q "select count(*) from \"Order\" where stat
 check "same snapshot again refused" "$(actr admin.jar /admin "$PAY" "[\"$U1\",$S1,$C1]")" "changed in the meantime"
 check "overpayment recorded"     "$(actr admin.jar /admin "$PAY" "[\"$U1\",$(snapshot "$U1"),200]")" "0.50 more than"
 check "admin page lists payments" "$(body admin.jar /admin | sed 's/<!-- -->//g')" "Ref: PP-REF-1"
+check "admin amounts in euro"    "$(body admin.jar /admin | sed 's/<!-- -->//g' | grep -oE 'Total Completed Money: [0-9.]+€|amount: \$' | sort -u | tr '\n' ' ')" "€"
+check "admin shows no dollar amounts" "$(body admin.jar /admin | sed 's/<!-- -->//g' | grep -c 'amount: \$')" "0"
 check "stats renders (with orders)" "$(body user.jar /stats)" "Understand your patterns"
 check "dashboard renders (with orders)" "$(body user2.jar /dashboard)" "Fritz Kola"
 
@@ -178,6 +187,9 @@ check "11th login attempt limited" "$(actr - /auth/login "$LOGIN" '[{"email":"us
 check "direct callback also limited" "$(csrf=$(curl -s -c "$T/rl.jar" "$B/api/auth/csrf" | json csrfToken); curl -s -o /dev/null -w '%{redirect_url}' -b "$T/rl.jar" -X POST "$B/api/auth/callback/credentials" --data-urlencode "csrfToken=$csrf" --data-urlencode email=user@test.local --data-urlencode password=password123)" "code=rate_limited"
 check "other account not limited" "$(actr - /auth/login "$LOGIN" '[{"email":"admin@test.local","password":"wrong"}]')" "Invalid email or password"
 q 'delete from "RateLimit"' >/dev/null
+for i in $(seq 1 10); do actr - /auth/login "$LOGIN" '[{"email":"nobody@test.local","password":"wrong"}]' >/dev/null; done
+check "unknown address: 11th attempt limited too" "$(actr - /auth/login "$LOGIN" '[{"email":"nobody@test.local","password":"wrong"}]')" "Too many attempts"
+q 'delete from "RateLimit"' >/dev/null
 q "update \"User\" set \"emailVerified\"=null where email='user2@test.local'" >/dev/null
 for i in $(seq 1 10); do actr - /auth/login "$LOGIN" '[{"email":"user2@test.local","password":"wrong"}]' >/dev/null; done
 check "unverified account: 11th attempt limited" "$(actr - /auth/login "$LOGIN" '[{"email":"user2@test.local","password":"wrong"}]')" "Too many attempts"
@@ -191,6 +203,19 @@ q 'alter table "RateLimit_off" rename to "RateLimit"' >/dev/null
 rm -f "$T/la.jar"
 curl -s -o /dev/null -c "$T/la.jar" -X POST "$B/auth/login" -H "Next-Action: $LOGIN" -H "Content-Type: text/plain;charset=UTF-8" -H "Accept: text/x-component" --data '[{"email":"user@test.local","password":"password123"}]'
 check "login action sets session" "$(curl -s -b "$T/la.jar" "$B/api/auth/session")" '"email":"user@test.local"'
+
+echo "== cron"
+check "cron without secret: 401" "$(curl -s -o /dev/null -w '%{http_code}' "$B/api/cron/achievements")" "401"
+check "cron with wrong secret: 401" "$(curl -s -o /dev/null -w '%{http_code}' -H 'Authorization: Bearer wrong' "$B/api/cron/achievements")" "401"
+if [[ -n "${CRON_SECRET:-}" ]]; then
+    q "update \"User\" set achievements='{}' where id='$U1'" >/dev/null
+    check "cron reconciliation runs" "$(curl -s -H "Authorization: Bearer $CRON_SECRET" "$B/api/cron/achievements")" '"failed":0'
+    check "cron restores missing awards" "$(q "select coalesce(cardinality(achievements),0) > 0 from \"User\" where id='$U1'")" "t"
+    curl -s -o /dev/null -H "Authorization: Bearer $CRON_SECRET" "$B/api/cron/achievements"
+    check "repeated cron adds no duplicates" "$(q "select bool_and(cardinality(achievements) = (select count(distinct a) from unnest(achievements) a)) from \"User\"")" "t"
+else
+    echo "SKIP  authorized cron checks (CRON_SECRET not set)"
+fi
 
 echo "---- $pass passed, $fail failed"
 [[ $fail -eq 0 ]]
