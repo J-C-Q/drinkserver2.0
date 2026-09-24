@@ -4,8 +4,20 @@
     {
       "name": "dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 3000
+    },
+    {
+      "name": "prod-local",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "DATABASE_URL=postgresql://qpreiss@localhost:5432/drinkserver_dev DIRECT_URL=postgresql://qpreiss@localhost:5432/drinkserver_dev AUTH_TRUST_HOST=true RESEND_API_KEY=re_local_placeholder NEXT_PUBLIC_APP_URL=http://localhost:3001 npx next start -p 3001"
+      ],
+      "port": 3001
     }
   ]
 }
