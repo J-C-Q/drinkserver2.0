@@ -24,11 +24,12 @@ const users = [
     { name: "Second User", email: "user2@test.local", role: "USER" },
 ];
 
+// Cards size themselves from the image; colors must be names used in drink-entry.tsx.
 const items = [
-    { itemname: "Club Mate", itemprice: 1.5, quantity: 20, sugar: 25, caffeine: 100, energy: 100, carbohydrate: 25, color: "white", bgcolor: "black" },
-    { itemname: "Fritz Kola", itemprice: 1.8, quantity: 10, sugar: 33, caffeine: 83, energy: 200, carbohydrate: 34, color: "white", bgcolor: "black" },
+    { itemname: "Club Mate", itemprice: 1.5, quantity: 20, sugar: 25, caffeine: 100, energy: 100, carbohydrate: 25, image: "/drinkImages/bgMioMio-Mate.png", color: "black", bgcolor: "orange" },
+    { itemname: "Fritz Kola", itemprice: 1.8, quantity: 10, sugar: 33, caffeine: 83, energy: 200, carbohydrate: 34, image: "/drinkImages/bgFritz-Kola.png", color: "white", bgcolor: "schwarz" },
     // Stock of exactly one, for testing concurrent purchases of the last item.
-    { itemname: "Last One", itemprice: 2.0, quantity: 1, sugar: 10, caffeine: 50, energy: 80, carbohydrate: 10, color: "white", bgcolor: "black" },
+    { itemname: "Last One", itemprice: 2.0, quantity: 1, sugar: 10, caffeine: 50, energy: 80, carbohydrate: 10, image: "/drinkImages/bgAfri-Cola.png", color: "white", bgcolor: "rot" },
 ];
 
 const achievementNames = [
