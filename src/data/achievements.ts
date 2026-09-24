@@ -9,7 +9,8 @@ export const getAllAchievements = async () => {
     }
 }
 
-export const getAchievementsOfUser = async (userid: string | undefined) => {
+// null means the read failed (or the user does not exist), not "none".
+export const getAchievementsOfUser = async (userid: string) => {
     try {
         const achievementIDs = await db.user.findUnique({ where: { id: userid }, select: { achievements: true } });
         if (achievementIDs == null) {
@@ -22,7 +23,7 @@ export const getAchievementsOfUser = async (userid: string | undefined) => {
     }
 }
 
-export const getAchievementsUserDoesntHave = async (userid: string | undefined) => {
+export const getAchievementsUserDoesntHave = async (userid: string) => {
     try {
         const achievementIDs = await db.user.findUnique({ where: { id: userid }, select: { achievements: true } });
         if (achievementIDs == null) {
@@ -31,11 +32,11 @@ export const getAchievementsUserDoesntHave = async (userid: string | undefined) 
         const achievements = await db.achievement.findMany({ where: { id: { notIn: achievementIDs.achievements } } });
         return achievements;
     } catch {
-        return false
+        return null
     }
 }
 
-export const addAchievementToUser = async (userid: string | undefined, achievementid: string | undefined) => {
+export const addAchievementToUser = async (userid: string, achievementid: string) => {
     try {
         await db.user.update({ where: { id: userid }, data: { achievements: { push: achievementid } } });
         return true;

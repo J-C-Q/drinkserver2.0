@@ -14,7 +14,6 @@ import {
   getAchievementsOfUser,
   getAchievementsUserDoesntHave,
 } from "@/data/achievements";
-import { Achievement } from "@prisma/client";
 import { MainStats } from "@/components/stats/mainstats";
 import { getSugarAndCaffeinStatsOfUser } from "@/data/stats";
 
@@ -43,13 +42,8 @@ const StatsPage = async () => {
   if (data) {
     addToBuckets(data, buckets);
   }
-  const achievements = (await getAchievementsOfUser(
-    userId
-  )) as Achievement[];
-
-  const openAchievements = (await getAchievementsUserDoesntHave(
-    userId
-  )) as Achievement[];
+  const achievements = await getAchievementsOfUser(userId);
+  const openAchievements = await getAchievementsUserDoesntHave(userId);
 
   const stats = await getSugarAndCaffeinStatsOfUser(userId);
   return (
@@ -61,27 +55,42 @@ const StatsPage = async () => {
           subtitle={"Understand your patterns"}
         ></Navigator>
       </SessionProvider>
-      <MainStats
-        totalSugar={stats?.total.sugar}
-        totalCaffein={stats?.total.caffeine}
-        todaySugar={stats?.today.sugar}
-        todayCaffein={stats?.today.caffeine}
-        lastWeekSugar={stats?.lastWeek.sugar}
-        lastWeekCaffein={stats?.lastWeek.caffeine}
-        lastMonthSugar={stats?.lastMonth.sugar}
-        lastMonthCaffein={stats?.lastMonth.caffeine}
-      />
-      <GithubLike data={buckets} />
-      <Achievements
-        achievements={achievements}
-        openAchievements={openAchievements}
-      />
+      {/* null means a failed read; show that instead of zeros or a crash. */}
+      {stats ? (
+        <MainStats
+          totalSugar={stats.total.sugar}
+          totalCaffein={stats.total.caffeine}
+          todaySugar={stats.today.sugar}
+          todayCaffein={stats.today.caffeine}
+          lastWeekSugar={stats.lastWeek.sugar}
+          lastWeekCaffein={stats.lastWeek.caffeine}
+          lastMonthSugar={stats.lastMonth.sugar}
+          lastMonthCaffein={stats.lastMonth.caffeine}
+        />
+      ) : (
+        <StatsError what="Your sugar and caffeine stats" />
+      )}
+      {data ? <GithubLike data={buckets} /> : <StatsError what="Your drink heatmap" />}
+      {achievements && openAchievements ? (
+        <Achievements
+          achievements={achievements}
+          openAchievements={openAchievements}
+        />
+      ) : (
+        <StatsError what="Your achievements" />
+      )}
       <Toaster richColors />
     </main>
   );
 };
 
 export default StatsPage;
+
+const StatsError = ({ what }: { what: string }) => (
+  <p className="my-6 text-center text-red-400">
+    {what} could not be loaded. Please reload the page.
+  </p>
+);
 
 // froce dynamic
 export const dynamic = "force-dynamic";

@@ -1,9 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 
 import {db} from "@/lib/db";
-import { updateAchievements } from "@/actions/update-achievements";
+import { awardAchievements } from "@/lib/achievements";
 
 import { getUserById } from "@/data/user";
 import { currentUser } from "@/lib/auth-guard";
@@ -61,6 +62,8 @@ export const order = async (itemid:string): Promise<OrderResult> => {
                     username: existingUser.name!=null?existingUser.name:"",
                     itemname: existingItem.itemname,
                     priceCents: existingItem.priceCents,
+                    sugar: existingItem.sugar,
+                    caffeine: existingItem.caffeine,
                     date: new Date(),
                     status: "PENDING"
                 }
@@ -73,11 +76,16 @@ export const order = async (itemid:string): Promise<OrderResult> => {
     }
 
     if(result.success) {
-        // Achievements are awarded here rather than while rendering /stats.
-        // A failure must not undo or hide the successful order.
-        try {
-            await updateAchievements();
-        } catch {}
+        // Awarded after the response is sent, so the purchase does not wait
+        // for a full-history scan. A failure is retried with the next order.
+        const userId = existingUser.id;
+        after(async () => {
+            try {
+                await awardAchievements(userId);
+            } catch (error) {
+                console.error("[achievements] award failed for", userId, error);
+            }
+        });
         revalidatePath("/drinks");
         revalidatePath("/dashboard");
         revalidatePath("/stats");

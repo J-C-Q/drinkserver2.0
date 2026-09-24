@@ -1,24 +1,21 @@
 import { db } from "@/lib/db";
+import { startOfBerlinDay } from "@/lib/berlin-time";
 
 type SugarAndCaffeine = { sugar: number; caffeine: number };
 
 // Loads the user's non-cancelled orders once and sums sugar and caffeine for
-// all time windows shown on the stats page.
+// all time windows shown on the stats page, using the values stored on each
+// order at purchase time. "Today" is the Berlin calendar day; week and month
+// are the rolling last 7 days and last month.
 export const getSugarAndCaffeinStatsOfUser = async (userId: string) => {
     try {
         const orders = await db.order.findMany({
             where: { userId, status: { not: "CANCELLED" } },
-            select: { itemid: true, date: true },
+            select: { date: true, sugar: true, caffeine: true },
         });
-        const items = await db.item.findMany({
-            where: { itemid: { in: Array.from(new Set(orders.map((order) => order.itemid))) } },
-            select: { itemid: true, sugar: true, caffeine: true },
-        });
-        const itemsById = new Map(items.map((item) => [item.itemid, item]));
 
         const now = new Date();
-        const startOfToday = new Date(now);
-        startOfToday.setHours(0, 0, 0, 0);
+        const startOfToday = startOfBerlinDay(now);
         const lastWeek = new Date(now);
         lastWeek.setDate(now.getDate() - 7);
         const lastMonth = new Date(now);
@@ -31,9 +28,8 @@ export const getSugarAndCaffeinStatsOfUser = async (userId: string) => {
                 if (since && order.date < since) {
                     continue;
                 }
-                const item = itemsById.get(order.itemid);
-                sugar += item?.sugar ?? 0;
-                caffeine += item?.caffeine ?? 0;
+                sugar += order.sugar ?? 0;
+                caffeine += order.caffeine ?? 0;
             }
             return { sugar, caffeine };
         };
@@ -44,7 +40,8 @@ export const getSugarAndCaffeinStatsOfUser = async (userId: string) => {
             lastWeek: sumSince(lastWeek),
             lastMonth: sumSince(lastMonth),
         };
-    } catch {
+    } catch (error) {
+        console.error("[stats] could not load nutrition stats:", error);
         return null;
     }
 };

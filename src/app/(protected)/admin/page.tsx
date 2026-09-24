@@ -7,7 +7,6 @@ import {
   getTotalMoneyPending,
   getTotalMoneyCompleted,
   getOrderTotalsByUser,
-  getPendingOrdersByUser,
   getRecentPayments,
 } from "@/data/order";
 import { RecordPayment } from "@/components/admin/record-payment";
@@ -20,11 +19,10 @@ const AdminPage = async () => {
   if (!admin) {
     redirect(DEFAULT_LOGIN_REDIRECT);
   }
-  const [users, totalsByUser, pendingByUser, payments, totalPending, totalCompleted] =
+  const [users, totalsByUser, payments, totalPending, totalCompleted] =
     await Promise.all([
       getAllUsers(),
       getOrderTotalsByUser(),
-      getPendingOrdersByUser(),
       getRecentPayments(),
       getTotalMoneyPending(),
       getTotalMoneyCompleted(),
@@ -51,13 +49,12 @@ const AdminPage = async () => {
         </div>
 
         <h1 className="text-2xl font-bold">Users</h1>
-        {(users === null || totalsByUser === null || pendingByUser === null) && (
+        {(users === null || totalsByUser === null) && (
           <p className="text-red-400">Users or orders could not be loaded.</p>
         )}
-        {users && totalsByUser && pendingByUser &&
+        {users && totalsByUser &&
         users.map((user) => {
             const totals = totalsByUser.get(user.id);
-            const pending = pendingByUser.get(user.id);
             return (
             <div key={user.id} className="p-2 border rounded">
                 <p>{user.name} ({user.id})</p>
@@ -65,13 +62,16 @@ const AdminPage = async () => {
                 <p>Pending amount: ${formatCents(totals?.pendingCents ?? 0)}</p>
                 <p>Orders completed: {totals?.completedCount ?? 0}</p>
                 <p>Completed amount: ${formatCents(totals?.completedCents ?? 0)}</p>
-                {pending && (
+                {totals?.pendingLatest && (
                   <RecordPayment
                     // Remount with fresh defaults when the pending orders change.
-                    key={pending.orderIds.join(",")}
+                    key={`${totals.pendingCount}-${totals.pendingLatest.toISOString()}`}
                     userId={user.id}
-                    orderIds={pending.orderIds}
-                    pendingCents={pending.cents}
+                    snapshot={{
+                      count: totals.pendingCount,
+                      cents: totals.pendingCents,
+                      latest: totals.pendingLatest.toISOString(),
+                    }}
                   />
                 )}
             </div>

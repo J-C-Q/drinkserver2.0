@@ -1,19 +1,15 @@
-"use server";
-
 import { getOrdersForUser } from "@/data/order";
 import { addAchievementToUser, getAllAchievements } from "@/data/achievements";
 import { getAchievementsOfUser } from "@/data/achievements";
 import { Achievement, Item } from '@prisma/client'
 import { getAllItems } from "@/data/item";
-import { currentUser } from "@/lib/auth-guard";
+import { berlinDay, berlinWeek } from "@/lib/berlin-time";
 
-// Always updates the session user's achievements.
-export const updateAchievements = async () => {
-    const user = await currentUser();
-    if (!user) {
-        return { error: "Not logged in!", code: 401 };
-    }
-    const userid = user.id;
+// Awards every achievement the user's order history now qualifies for.
+// Evaluated from the full history each time, so an award that failed to save
+// is picked up again after the next order. Not a server action: only called
+// from server code with an already-authenticated user id.
+export const awardAchievements = async (userid: string) => {
 
     const orders = await getOrdersForUser(userid);
     const items = await getAllItems();
@@ -22,7 +18,7 @@ export const updateAchievements = async () => {
 
 
     if (orders == null || items == null || possibleAchievements == null || achievements == null) {
-        return { error: "Error while fetching data", code: 500 };
+        throw new Error("could not load achievement data");
     }
     const achievementIds = achievements.map((achievement: Achievement) => achievement.id);
     for (let achievement in possibleAchievements) {
@@ -31,7 +27,9 @@ export const updateAchievements = async () => {
         if (!(achievementIds.includes(possibleAchievements[achievement].id))) {
             if (checkAchievement(orders, items, possibleAchievements[achievement].name)) {
                 // add the achievement to the user
-                await addAchievementToUser(userid, possibleAchievements[achievement].id);
+                if (!(await addAchievementToUser(userid, possibleAchievements[achievement].id))) {
+                    throw new Error(`could not save achievement ${possibleAchievements[achievement].name}`);
+                }
             }
         }
     }
@@ -42,6 +40,8 @@ type Order = {
     date: Date;
     itemid: string;
     itemname: string;
+    sugar: number | null;
+    caffeine: number | null;
 }
 
 function checkAchievement(orders: Order[], items: Item[], achievementName: string) {
@@ -156,30 +156,25 @@ function checkJunkie(orders: Order[]) {
 }
 
 function checkCaffeinBomb(orders: Order[], items: Item[]) {
-    return exceedsDailyTotal(orders, items, "caffeine", 200);
+    return exceedsDailyTotal(orders, "caffeine", 200);
 }
 
 function checkCaffeinOverdose(orders: Order[], items: Item[]) {
-    return exceedsDailyTotal(orders, items, "caffeine", 400);
+    return exceedsDailyTotal(orders, "caffeine", 400);
 }
 
 function checkSugarShock(orders: Order[], items: Item[]) {
-    return exceedsDailyTotal(orders, items, "sugar", 50);
+    return exceedsDailyTotal(orders, "sugar", 50);
 }
 
 // True if on any Berlin calendar day the drinks add up to at least threshold,
-// including a single drink that reaches it on its own.
-function exceedsDailyTotal(orders: Order[], items: Item[], field: "caffeine" | "sugar", threshold: number) {
-    // By id, not name: drinks get renamed, orders keep the old name.
-    const amountById: Map<string, number> = new Map();
-    for (let item of items) {
-        amountById.set(item.itemid, item[field] ?? 0);
-    }
-
+// including a single drink that reaches it on its own. Uses the values stored
+// on each order at purchase time.
+function exceedsDailyTotal(orders: Order[], field: "caffeine" | "sugar", threshold: number) {
     const totalPerDay: Map<string, number> = new Map();
     for (let order of orders) {
         const day = berlinDay(order.date);
-        const total = (totalPerDay.get(day) ?? 0) + (amountById.get(order.itemid) ?? 0);
+        const total = (totalPerDay.get(day) ?? 0) + (order[field] ?? 0);
         if (total >= threshold) {
             return true;
         }
@@ -252,18 +247,4 @@ function checkMoreInAWeek(orders: Order[], items: Item[], itemname:string){
 
     }
     return false
-}
-
-
-// Calendar day in Berlin as YYYY-MM-DD, independent of the server's time zone.
-function berlinDay(date: Date) {
-    return date.toLocaleDateString("sv-SE", { timeZone: "Europe/Berlin" });
-}
-
-// Monday of the Berlin calendar week as YYYY-MM-DD, so weeks of different
-// years never compare equal.
-function berlinWeek(date: Date) {
-    const day = new Date(berlinDay(date) + "T00:00:00Z");
-    day.setUTCDate(day.getUTCDate() - ((day.getUTCDay() + 6) % 7));
-    return day.toISOString().slice(0, 10);
 }

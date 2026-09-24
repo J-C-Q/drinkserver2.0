@@ -60,6 +60,11 @@ export const DrinkEntry = ({
   color,
 }: DrinkEntryProps) => {
   const [quantity, setQuantity] = useState(drinkquantity);
+  // Take the server's stock whenever the page is refreshed, e.g. after a
+  // purchase revalidates /drinks or when the tab regains focus.
+  useEffect(() => {
+    setQuantity(drinkquantity);
+  }, [drinkquantity]);
 
   //   const fetchquantity = async () => {
   //     await fetchItemQuantity(drinkid)

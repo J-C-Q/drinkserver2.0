@@ -94,6 +94,11 @@ model Order {
   itemname   String
   // Price at the time of the order, in euro cents.
   priceCents Int
+  // Nutrition per drink at the time of the order, so later item edits do
+  // not change past stats. Orders from before this column were backfilled
+  // from the item values at migration time.
+  sugar      Float?
+  caffeine   Float?
   date       DateTime
   status     OrderStatus @default(PENDING)
   paymentId  String?

@@ -1,6 +1,7 @@
 import { auth, signOut } from "@/auth";
 import { getItems } from "@/data/item";
 import { DrinkEntry } from "@/components/drinks/drink-entry";
+import { RefreshOnFocus } from "@/components/drinks/refresh-on-focus";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "@/components/ui/sonner";
 import { Navigator } from "@/components/drinks/navigation";
@@ -117,6 +118,7 @@ const DrinksPage = async () => {
             );
           })}
         <Toaster richColors />
+        <RefreshOnFocus />
       </div>
     </main>
   );

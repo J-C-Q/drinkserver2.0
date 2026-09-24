@@ -8,14 +8,21 @@ import { formatCents } from "@/lib/money";
 
 type PaymentResult = { success?: string; error?: string; code: number };
 
+// What the admin saw on the page for this user.
+export type PendingSnapshot = { count: number; cents: number; latest: string };
+
 class OrdersChangedError extends Error {}
 
-// Records a payment an admin received and settles exactly the given orders.
-// orderIds are the pending orders the admin saw; orders placed afterwards stay
-// pending, and nothing is settled if any of the given orders already changed.
+const MAX_CENTS = 100_000_00;
+
+// Records a payment an admin received and settles the user's pending orders
+// up to snapshot.latest, the newest pending order the admin saw. Orders placed
+// afterwards stay pending. Nothing is settled unless those orders still have
+// exactly the count and total the admin saw, and the amount received covers
+// the total: underpayment is refused, overpayment is recorded as received.
 export const recordPayment = async (
     userId: string,
-    orderIds: string[],
+    snapshot: PendingSnapshot,
     amountCents: number,
     reference?: string,
 ): Promise<PaymentResult> => {
@@ -25,38 +32,43 @@ export const recordPayment = async (
     }
 
     // Server action arguments are not type-checked at runtime.
+    const latest = typeof snapshot?.latest === "string" ? new Date(snapshot.latest) : null;
     if (
         typeof userId !== "string" || userId === "" ||
-        !Array.isArray(orderIds) || orderIds.length === 0 || orderIds.length > 1000 ||
-        orderIds.some((id) => typeof id !== "string" || id === "")
+        !Number.isInteger(snapshot?.count) || snapshot.count < 1 ||
+        !Number.isInteger(snapshot?.cents) || snapshot.cents < 0 || snapshot.cents > MAX_CENTS ||
+        latest === null || Number.isNaN(latest.getTime())
     ) {
         return { error: "Invalid payment details.", code: 400 };
     }
-    if (!Number.isInteger(amountCents) || amountCents < 0 || amountCents > 100_000_00) {
+    if (!Number.isInteger(amountCents) || amountCents < 0 || amountCents > MAX_CENTS) {
         return { error: "Enter an amount between 0.00 and 100000.00.", code: 400 };
+    }
+    if (amountCents < snapshot.cents) {
+        return { error: `${formatCents(amountCents)} does not cover the pending ${formatCents(snapshot.cents)}. Partial payments are not supported.`, code: 400 };
     }
     if (reference !== undefined && typeof reference !== "string") {
         return { error: "Invalid payment reference.", code: 400 };
     }
     const trimmedReference = reference?.trim().slice(0, 200) || null;
-    const ids = Array.from(new Set(orderIds));
+    const where = { userId, status: "PENDING" as const, date: { lte: latest } };
 
     try {
-        const ordersCents = await db.$transaction(async (tx) => {
-            const orders = await tx.order.findMany({
-                where: { orderId: { in: ids }, userId, status: "PENDING" },
-                select: { priceCents: true },
+        await db.$transaction(async (tx) => {
+            const current = await tx.order.aggregate({
+                where,
+                _count: { _all: true },
+                _sum: { priceCents: true },
             });
-            if (orders.length !== ids.length) {
+            if (current._count._all !== snapshot.count || (current._sum.priceCents ?? 0) !== snapshot.cents) {
                 throw new OrdersChangedError();
             }
-            const total = orders.reduce((sum, order) => sum + order.priceCents, 0);
 
             const payment = await tx.payment.create({
                 data: {
                     userId,
                     amountCents,
-                    ordersCents: total,
+                    ordersCents: snapshot.cents,
                     reference: trimmedReference,
                     confirmedById: admin.id,
                 },
@@ -65,23 +77,20 @@ export const recordPayment = async (
             // The status condition makes a concurrent second recording of the
             // same orders update nothing, which rolls it back.
             const settled = await tx.order.updateMany({
-                where: { orderId: { in: ids }, userId, status: "PENDING" },
+                where,
                 data: { status: "COMPLETED", paymentId: payment.id },
             });
-            if (settled.count !== ids.length) {
+            if (settled.count !== snapshot.count) {
                 throw new OrdersChangedError();
             }
-            return total;
         });
 
         revalidatePath("/admin");
         revalidatePath("/dashboard");
 
-        const difference = amountCents - ordersCents;
-        const note = difference === 0
-            ? ""
-            : ` Received ${formatCents(amountCents)} for orders totalling ${formatCents(ordersCents)} (${difference > 0 ? "+" : ""}${formatCents(difference)}).`;
-        return { success: `Payment recorded for ${ids.length} order${ids.length === 1 ? "" : "s"}.${note}`, code: 200 };
+        const extra = amountCents - snapshot.cents;
+        const note = extra === 0 ? "" : ` Received ${formatCents(extra)} more than the orders total.`;
+        return { success: `Payment recorded for ${snapshot.count} order${snapshot.count === 1 ? "" : "s"}.${note}`, code: 200 };
     } catch (error) {
         if (error instanceof OrdersChangedError) {
             return { error: "These orders changed in the meantime. Reload the page and check again.", code: 409 };
