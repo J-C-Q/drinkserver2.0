@@ -7,6 +7,12 @@ body,
 :root {
     height: 100%;
 }
+
+/* iOS shows the root background in the overscroll bounce and behind the
+   status bar, so keep it matching the dark page gradient instead of white. */
+html {
+    background-color: #000;
+}
  
 
 @layer base {
@@ -62,6 +68,6 @@ body,
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
   }
 }

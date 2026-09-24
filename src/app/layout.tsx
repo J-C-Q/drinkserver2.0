@@ -49,6 +49,9 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#1E2835",
+  // Draw under the status bar / Dynamic Island in the installed web app so the
+  // page gradient fills it; layouts pad themselves with env(safe-area-inset-*).
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
