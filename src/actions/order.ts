@@ -1,6 +1,9 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import {db} from "@/lib/db";
+import { updateAchievements } from "@/actions/update-achievements";
 
 import { getUserById } from "@/data/user";
 import { currentUser } from "@/lib/auth-guard";
@@ -31,8 +34,9 @@ export const order = async (itemid:string): Promise<OrderResult> => {
         return {error: "Your are not authorized yet, please contact the admin", code: 403};
     }
 
+    let result: OrderResult;
     try {
-        return await db.$transaction(async (tx): Promise<OrderResult> => {
+        result = await db.$transaction(async (tx): Promise<OrderResult> => {
             // Conditional decrement: only succeeds while stock is left, so
             // concurrent purchases of the last item cannot both go through.
             const decremented = await tx.item.updateMany({
@@ -67,4 +71,17 @@ export const order = async (itemid:string): Promise<OrderResult> => {
     } catch {
         return {error: "Order failed, please try again", code: 500};
     }
+
+    if(result.success) {
+        // Achievements are awarded here rather than while rendering /stats.
+        // A failure must not undo or hide the successful order.
+        try {
+            await updateAchievements();
+        } catch {}
+        revalidatePath("/drinks");
+        revalidatePath("/dashboard");
+        revalidatePath("/stats");
+    }
+
+    return result;
 };

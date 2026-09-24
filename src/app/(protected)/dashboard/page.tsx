@@ -29,12 +29,21 @@ const DashboardPage = async () => {
         ></Navigator>
       </SessionProvider>
 
-      <Receipt
-        username={session?.user.name}
-        userid={userId}
-        orders={orders}
-      />
-      <OrderTable orders={orders} />
+      {orders === null ? (
+        // null means the read failed, not that there are no orders.
+        <p className="mt-10 text-center text-red-400">
+          Your orders could not be loaded. Please reload the page.
+        </p>
+      ) : (
+        <>
+          <Receipt
+            username={session?.user.name}
+            userid={userId}
+            orders={orders}
+          />
+          <OrderTable orders={orders} />
+        </>
+      )}
     </main>
   );
 };

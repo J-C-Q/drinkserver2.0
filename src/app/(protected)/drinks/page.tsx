@@ -97,7 +97,6 @@ const DrinksPage = async () => {
         {drinks &&
           drinks.map((drink) => {
             return (
-              <SessionProvider key={drink.itemid}>
                 <DrinkEntry
                   drinkname={drink.itemname}
                   drinkid={drink.itemid}
@@ -115,7 +114,6 @@ const DrinksPage = async () => {
                   color={drink.color ? drink.color : undefined}
                   key={drink.itemid}
                 />
-              </SessionProvider>
             );
           })}
         <Toaster richColors />

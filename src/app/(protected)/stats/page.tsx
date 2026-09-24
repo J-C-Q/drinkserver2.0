@@ -14,15 +14,9 @@ import {
   getAchievementsOfUser,
   getAchievementsUserDoesntHave,
 } from "@/data/achievements";
-import { updateAchievements } from "@/actions/update-achievements";
 import { Achievement } from "@prisma/client";
 import { MainStats } from "@/components/stats/mainstats";
-import {
-  getLastWeekSugarAndCaffeinOfUser,
-  getTodaySugarAndCaffeinOfUser,
-  getTotalSugarAndCaffeinOfUser,
-  getLastMonthSugarAndCaffeinOfUser,
-} from "@/data/stats";
+import { getSugarAndCaffeinStatsOfUser } from "@/data/stats";
 
 type WeekDays =
   | "Sunday"
@@ -49,7 +43,6 @@ const StatsPage = async () => {
   if (data) {
     addToBuckets(data, buckets);
   }
-  await updateAchievements();
   const achievements = (await getAchievementsOfUser(
     userId
   )) as Achievement[];
@@ -58,14 +51,7 @@ const StatsPage = async () => {
     userId
   )) as Achievement[];
 
-  const statsTotal = await getTotalSugarAndCaffeinOfUser(userId);
-  const statsToday = await getTodaySugarAndCaffeinOfUser(userId);
-  const statsLastWeek = await getLastWeekSugarAndCaffeinOfUser(
-    userId
-  );
-  const statsLastMonth = await getLastMonthSugarAndCaffeinOfUser(
-    userId
-  );
+  const stats = await getSugarAndCaffeinStatsOfUser(userId);
   return (
     <main className="min-h-screen w-full">
       <SessionProvider>
@@ -76,14 +62,14 @@ const StatsPage = async () => {
         ></Navigator>
       </SessionProvider>
       <MainStats
-        totalSugar={statsTotal?.totalSugar}
-        totalCaffein={statsTotal?.totalCaffeine}
-        todaySugar={statsToday?.todaySugar}
-        todayCaffein={statsToday?.todayCaffeine}
-        lastWeekSugar={statsLastWeek?.lastWeekSugar}
-        lastWeekCaffein={statsLastWeek?.lastWeekCaffeine}
-        lastMonthSugar={statsLastMonth?.lastMonthSugar}
-        lastMonthCaffein={statsLastMonth?.lastMonthCaffeine}
+        totalSugar={stats?.total.sugar}
+        totalCaffein={stats?.total.caffeine}
+        todaySugar={stats?.today.sugar}
+        todayCaffein={stats?.today.caffeine}
+        lastWeekSugar={stats?.lastWeek.sugar}
+        lastWeekCaffein={stats?.lastWeek.caffeine}
+        lastMonthSugar={stats?.lastMonth.sugar}
+        lastMonthCaffein={stats?.lastMonth.caffeine}
       />
       <GithubLike data={buckets} />
       <Achievements

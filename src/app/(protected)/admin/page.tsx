@@ -2,9 +2,7 @@ import { redirect } from "next/navigation";
 import { SessionProvider } from "next-auth/react";
 import { Navigator } from "@/components/drinks/navigation";
 import { getAllUsers } from "@/data/user";
-import { getPendingOrdersForUser } from "@/data/order";
-import { getCompletedOrdersForUser } from "@/data/order";
-import {getTotalMoneyPending, getTotalMoneyCompleted} from "@/data/order";
+import {getTotalMoneyPending, getTotalMoneyCompleted, getOrderTotalsByUser} from "@/data/order";
 import { ClearPending } from "@/components/admin/clear-pending";
 import { currentAdmin } from "@/lib/auth-guard";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
@@ -15,6 +13,7 @@ const AdminPage = async () => {
     redirect(DEFAULT_LOGIN_REDIRECT);
   }
   const users = await getAllUsers();
+  const totalsByUser = await getOrderTotalsByUser();
   return (
     <main className="min-h-screen w-full">
       <SessionProvider>
@@ -39,23 +38,22 @@ const AdminPage = async () => {
         </div>
         
         <h1 className="text-2xl font-bold">Users</h1>
-        {users &&
-        users.map(async (user) => {
-            const pendingOrders =  await getPendingOrdersForUser(user.id);
-            const pendingMoney = pendingOrders?.reduce((acc, order) => acc + order.itemprice, 0) || 0;
-            const completedOrders = await getCompletedOrdersForUser(user.id);
-            const completedMoney = completedOrders?.reduce((acc, order) => acc + order.itemprice, 0) || 0;
+        {(users === null || totalsByUser === null) && (
+          <p className="text-red-400">Users or orders could not be loaded.</p>
+        )}
+        {users && totalsByUser &&
+        users.map((user) => {
+            const totals = totalsByUser.get(user.id);
             return (
             <div key={user.id} className="p-2 border rounded">
                 <p>{user.name} ({user.id})</p>
-                <p>Orders pending: {pendingOrders?.length}</p>
-                <p>Pending amount: ${pendingMoney.toFixed(2)}</p>
-                <p>Orders completed: {completedOrders?.length}</p>
-                <p>Completed amount: ${completedMoney.toFixed(2)}</p>
+                <p>Orders pending: {totals?.pendingCount ?? 0}</p>
+                <p>Pending amount: ${(totals?.pendingAmount ?? 0).toFixed(2)}</p>
+                <p>Orders completed: {totals?.completedCount ?? 0}</p>
+                <p>Completed amount: ${(totals?.completedAmount ?? 0).toFixed(2)}</p>
                 <ClearPending userid={user.id} />
             </div>
-            
-            );  
+            );
         })}
     </div>
     </main>

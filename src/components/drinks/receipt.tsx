@@ -35,9 +35,7 @@ export const Receipt = ({ username, userid, orders }: ReceiptProps) => {
     acc[order.itemname][1] += order.itemprice;
     return acc;
   }, {} as Record<string, number[]>);
-  const ordersAsArray = Object.entries(
-    ordersByItem as Record<string, number[]>
-  );
+  const ordersAsArray = Object.entries(ordersByItem ?? {});
 
   const total = ordersAsArray.reduce((acc, order) => {
     acc += order[1][1];

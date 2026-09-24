@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useSession } from "next-auth/react";
 import {
   Drawer,
   DrawerClose,
@@ -59,8 +58,6 @@ export const DrinkEntry = ({
   bgcolor,
   color,
 }: DrinkEntryProps) => {
-  const session = useSession();
-  const userid = session.data?.user.id;
   const [quantity, setQuantity] = useState(drinkquantity);
 
   //   const fetchquantity = async () => {
@@ -198,27 +195,24 @@ export const DrinkEntry = ({
               className="w-[80%] h-12 mx-auto bg-transparent"
               variant="outline"
               onClick={() => {
-                if (userid) {
-                  const promise = () => order(drinkid);
-                  toast.promise(promise, {
-                    loading: `Processing order ...`,
-                    success: (data) => {
-                      if (data.success != undefined && data.success != "") {
-                        toast.success(data.success);
-                        setQuantity(quantity - 1);
-                      }
-                      if (data.error != undefined && data.error != "") {
-                        toast.error(data.error);
-                      }
-                      //   fetchquantity();
+                // The server takes the user from the session.
+                const promise = () => order(drinkid);
+                toast.promise(promise, {
+                  loading: `Processing order ...`,
+                  success: (data) => {
+                    if (data.success != undefined && data.success != "") {
+                      toast.success(data.success);
+                      setQuantity(quantity - 1);
+                    }
+                    if (data.error != undefined && data.error != "") {
+                      toast.error(data.error);
+                    }
+                    //   fetchquantity();
 
-                      return "Order processed!";
-                    },
-                    error: "Error",
-                  });
-                } else {
-                  toast.error("Userid not found, please reload the page");
-                }
+                    return "Order processed!";
+                  },
+                  error: "Error",
+                });
               }}
             >
               <span className="text-xl font-semibold">

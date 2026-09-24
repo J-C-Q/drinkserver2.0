@@ -32,7 +32,7 @@ export const getItems = async () => {
         const items = await db.item.findMany({
             where: {
                 quantity: {
-                    not: 0
+                    gt: 0
                 }
             }
         });
@@ -42,3 +42,13 @@ export const getItems = async () => {
     }
 }
 
+
+// All products, including sold-out ones, for evaluating historical orders.
+export const getAllItems = async () => {
+    try {
+        const items = await db.item.findMany();
+        return items;
+    } catch {
+        return null
+    }
+}

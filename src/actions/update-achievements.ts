@@ -4,7 +4,7 @@ import { getOrdersForUser } from "@/data/order";
 import { addAchievementToUser, getAllAchievements } from "@/data/achievements";
 import { getAchievementsOfUser } from "@/data/achievements";
 import { Achievement, Item } from '@prisma/client'
-import { getItems } from "@/data/item";
+import { getAllItems } from "@/data/item";
 import { currentUser } from "@/lib/auth-guard";
 
 // Always updates the session user's achievements.
@@ -16,7 +16,7 @@ export const updateAchievements = async () => {
     const userid = user.id;
 
     const orders = await getOrdersForUser(userid);
-    const items = await getItems();
+    const items = await getAllItems();
     const possibleAchievements = await getAllAchievements();
     const achievements = await getAchievementsOfUser(userid)
 
@@ -123,7 +123,8 @@ function checkEarlyBird(orders: Order[]) {
 
 function checkWeekendWarrior(orders: Order[]) {
     for (let order of orders) {
-        if (order.date.getDay() == 0 || order.date.getDay() == 6) {
+        const weekday = order.date.toLocaleDateString("en-US", { weekday: "short", timeZone: "Europe/Berlin" });
+        if (weekday == "Sat" || weekday == "Sun") {
             return true;
         }
     }
@@ -132,28 +133,14 @@ function checkWeekendWarrior(orders: Order[]) {
 
 
 function checkNDrinksADay(orders: Order[], N: number) {
-
-    if (orders.length == 0) {
-        return false;
-    }
-    let count = 1;
-    let lastOrder = orders[0];
-    // for loop starting from the second order
-    for (let i = 1; i < orders.length; i++) {
-        if (
-            orders[i].date.getDate() == lastOrder.date.getDate() &&
-            orders[i].date.getMonth() == lastOrder.date.getMonth() &&
-            orders[i].date.getFullYear() == lastOrder.date.getFullYear()
-        ) {
-            count++;
-            if (count >= N) {
-                return true;
-            }
+    const drinksPerDay: Map<string, number> = new Map();
+    for (let order of orders) {
+        const day = berlinDay(order.date);
+        const count = (drinksPerDay.get(day) ?? 0) + 1;
+        if (count >= N) {
+            return true;
         }
-        else {
-            count = 1;
-            lastOrder = orders[i];
-        }
+        drinksPerDay.set(day, count);
     }
     return false;
 }
@@ -168,123 +155,33 @@ function checkJunkie(orders: Order[]) {
 }
 
 function checkCaffeinBomb(orders: Order[], items: Item[]) {
-
-    if (orders.length == 0) {
-        return false;
-    }
-
-    // import caffeine values from the items db
-    const indexMap: Map<string, number> = new Map();
-
-    if (items) {
-        for (let item of items) {
-            indexMap.set(item.itemname, item.caffeine ?? 0);
-        }
-    } else {
-        return false;
-    }
-
-    let caffeine = indexMap.get(orders[0].itemname) ?? 0;
-    let lastOrder = orders[0];
-
-    // for loop starting from the second order
-    for (let i = 1; i < orders.length; i++) {
-        if (
-            orders[i].date.getDate() == lastOrder.date.getDate() &&
-            orders[i].date.getMonth() == lastOrder.date.getMonth() &&
-            orders[i].date.getFullYear() == lastOrder.date.getFullYear()
-        ) {
-
-            caffeine += indexMap.get(orders[i].itemname) ?? 0;
-            if (caffeine >= 200) {
-                return true;
-            }
-        }
-        else {
-            caffeine = indexMap.get(orders[i].itemname) ?? 0;
-            lastOrder = orders[i];
-        }
-    }
-    return false;
+    return exceedsDailyTotal(orders, items, "caffeine", 200);
 }
 
 function checkCaffeinOverdose(orders: Order[], items: Item[]) {
-
-    if (orders.length == 0) {
-        return false;
-    }
-
-    // import caffeine values from the items db
-    const indexMap: Map<string, number> = new Map();
-
-    if (items) {
-        for (let item of items) {
-            indexMap.set(item.itemname, item.caffeine ?? 0);
-        }
-    } else {
-        return false;
-    }
-
-    let caffeine = indexMap.get(orders[0].itemname) ?? 0;
-    let lastOrder = orders[0];
-
-    // for loop starting from the second order
-    for (let i = 1; i < orders.length; i++) {
-        if (
-            orders[i].date.getDate() == lastOrder.date.getDate() &&
-            orders[i].date.getMonth() == lastOrder.date.getMonth() &&
-            orders[i].date.getFullYear() == lastOrder.date.getFullYear()
-        ) {
-
-            caffeine += indexMap.get(orders[i].itemname) ?? 0;
-            if (caffeine >= 400) {
-                return true;
-            }
-        }
-        else {
-            caffeine = indexMap.get(orders[i].itemname) ?? 0;
-            lastOrder = orders[i];
-        }
-    }
-    return false;
+    return exceedsDailyTotal(orders, items, "caffeine", 400);
 }
 
 function checkSugarShock(orders: Order[], items: Item[]) {
+    return exceedsDailyTotal(orders, items, "sugar", 50);
+}
 
-
-    if (orders.length == 0) {
-        return false;
+// True if on any Berlin calendar day the drinks add up to at least threshold,
+// including a single drink that reaches it on its own.
+function exceedsDailyTotal(orders: Order[], items: Item[], field: "caffeine" | "sugar", threshold: number) {
+    const amountByName: Map<string, number> = new Map();
+    for (let item of items) {
+        amountByName.set(item.itemname, item[field] ?? 0);
     }
 
-    // import sugar values from the items db
-    const indexMap: Map<string, number> = new Map();
-
-    if (items) {
-        for (let item of items) {
-            indexMap.set(item.itemname, item.sugar ?? 0);
+    const totalPerDay: Map<string, number> = new Map();
+    for (let order of orders) {
+        const day = berlinDay(order.date);
+        const total = (totalPerDay.get(day) ?? 0) + (amountByName.get(order.itemname) ?? 0);
+        if (total >= threshold) {
+            return true;
         }
-    } else {
-        return false;
-    }
-
-    let sugar = indexMap.get(orders[0].itemname) ?? 0;
-    let lastOrder = orders[0];
-
-    // for loop starting from the second order
-    for (let i = 1; i < orders.length; i++) {
-        if (
-            orders[i].date.getDate() == lastOrder.date.getDate() &&
-            orders[i].date.getMonth() == lastOrder.date.getMonth() &&
-            orders[i].date.getFullYear() == lastOrder.date.getFullYear()) {
-            sugar += indexMap.get(orders[i].itemname) ?? 0;
-            if (sugar >= 50) {
-                return true;
-            }
-        }
-        else {
-            sugar = indexMap.get(orders[i].itemname) ?? 0;
-            lastOrder = orders[i];
-        }
+        totalPerDay.set(day, total);
     }
     return false;
 }
@@ -325,9 +222,9 @@ function checkMoreInAWeek(orders: Order[], itemname:string){
     }
     let drinkThisWeek = 0;
     let notDrinkThisWeek = 0;
-    let currentWeek = getWeek(orders[0].date);
+    let currentWeek = berlinWeek(orders[0].date);
     for (let order of orders){
-        if (currentWeek==getWeek(order.date)){
+        if (currentWeek==berlinWeek(order.date)){
             if (order.itemname == itemname) {
                 drinkThisWeek += 1;
             } else {
@@ -347,7 +244,7 @@ function checkMoreInAWeek(orders: Order[], itemname:string){
                 notDrinkThisWeek =1;
                 drinkThisWeek = 0
             }
-            currentWeek = getWeek(order.date)
+            currentWeek = berlinWeek(order.date)
         }
 
     }
@@ -355,33 +252,15 @@ function checkMoreInAWeek(orders: Order[], itemname:string){
 }
 
 
-function getWeek(date:Date) {
-    /*getWeek() was developed by Nick Baicoianu at MeanFreePath: http://www.meanfreepath.com */
+// Calendar day in Berlin as YYYY-MM-DD, independent of the server's time zone.
+function berlinDay(date: Date) {
+    return date.toLocaleDateString("sv-SE", { timeZone: "Europe/Berlin" });
+}
 
-        let dowOffset = 1; //default dowOffset to zero
-        var newYear = new Date(date.getFullYear(),0,1);
-        var day = newYear.getDay() - dowOffset; //the day of week the year begins on
-        day = (day >= 0 ? day : day + 7);
-        var daynum = Math.floor((date.getTime() - newYear.getTime() - 
-        (date.getTimezoneOffset()-newYear.getTimezoneOffset())*60000)/86400000) + 1;
-        var weeknum;
-        //if the year starts before the middle of a week
-        if(day < 4) {
-            weeknum = Math.floor((daynum+day-1)/7) + 1;
-            if(weeknum > 52) {
-                let nYear = new Date(date.getFullYear() + 1,0,1);
-                let nday = nYear.getDay() - dowOffset;
-                nday = nday >= 0 ? nday : nday + 7;
-                /*if the next year starts before the middle of
-                  the week, it is week #1 of that year*/
-                weeknum = nday < 4 ? 1 : 53;
-            }
-        }
-        else {
-            weeknum = Math.floor((daynum+day-1)/7);
-        }
-        return weeknum;
-    };
-
-    // console.log(getWeek(new Date(2024,3,22)))
-    
+// Monday of the Berlin calendar week as YYYY-MM-DD, so weeks of different
+// years never compare equal.
+function berlinWeek(date: Date) {
+    const day = new Date(berlinDay(date) + "T00:00:00Z");
+    day.setUTCDate(day.getUTCDate() - ((day.getUTCDay() + 6) % 7));
+    return day.toISOString().slice(0, 10);
+}
