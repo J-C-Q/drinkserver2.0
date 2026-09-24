@@ -58,11 +58,14 @@ export const MainStats = (
     >
       <div
         className={cn(
-          "bg-gradient-to-tr from-[#FF6B6B] to-[#dd4d51] grow text-center text-5xl flex justify-center items-center relative font-bold bg-clip-text text-transparent translate-y-[-10px]  " +
+          "grow text-center text-5xl flex justify-center items-center relative font-bold translate-y-[-10px]  " +
             font.className
         )}
       >
-        {((sugarStats[pointer ?? 0] ?? 0) / 1000).toFixed(2)}
+        {/* Gradient only on the number: bg-clip-text would also paint the labels. */}
+        <span className="bg-gradient-to-tr from-[#FF6B6B] to-[#dd4d51] bg-clip-text text-transparent">
+          {((sugarStats[pointer ?? 0] ?? 0) / 1000).toFixed(2)}
+        </span>
 
         <div className="absolute text-sm left-[50%] translate-x-[-60px] top-[50%] translate-y-[-40px] text-gray-600 not-italic whitespace-nowrap">
           sugar
@@ -73,11 +76,14 @@ export const MainStats = (
       </div>
       <div
         className={cn(
-          "bg-gradient-to-tr from-[#FFD700] to-[#ddb900] grow text-center text-5xl flex justify-center items-center relative font-bold bg-clip-text text-transparent translate-y-[10px] " +
+          "grow text-center text-5xl flex justify-center items-center relative font-bold translate-y-[10px] " +
             font.className
         )}
       >
-        {((caffeineStats[pointer ?? 0] ?? 0) / 1000).toFixed(2)}
+        {/* Gradient only on the number: bg-clip-text would also paint the labels. */}
+        <span className="bg-gradient-to-tr from-[#FFD700] to-[#ddb900] bg-clip-text text-transparent">
+          {((caffeineStats[pointer ?? 0] ?? 0) / 1000).toFixed(2)}
+        </span>
         <div className="absolute text-sm left-[50%] translate-x-[-60px] top-[50%] translate-y-[-40px] text-gray-600 not-italic whitespace-nowrap">
           caffeine
         </div>

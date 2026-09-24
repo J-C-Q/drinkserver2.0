@@ -193,9 +193,9 @@ export const DrinkEntry = ({
           >
             {drinkid}
           </span>
-          <DrawerClose>
+          <DrawerClose asChild>
             <Button
-              className="w-[80%] h-12 bg-transparent"
+              className="w-[80%] h-12 mx-auto bg-transparent"
               variant="outline"
               onClick={() => {
                 if (userid) {
