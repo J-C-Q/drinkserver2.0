@@ -7,7 +7,7 @@ import { getUserByEmail } from "@/data/user";
 import { db } from "@/lib/db";
 
 export const newPassword = async (values: z.infer<typeof NewPasswordSchema>,token?: string | null) => {
-    if(!token) {
+    if(typeof token !== "string" || token === "") {
         return {error: "Missing token!", code: 400};
     }
 
@@ -49,7 +49,8 @@ export const newPassword = async (values: z.infer<typeof NewPasswordSchema>,toke
         }
         await tx.user.update({
             where: {id: existingUser.id},
-            data: {password: hashedPassword}
+            // Signs out sessions that started before the change (see auth.ts).
+            data: {password: hashedPassword, passwordChangedAt: new Date()}
         });
         return true;
     });

@@ -1,9 +1,10 @@
 import {db} from "@/lib/db";
+import { hashToken } from "@/lib/token-hash";
 
 export const getPasswordResetTokenByToken = async (token: string) => {
 try {
     const passwordResetToken = await db.passwordResetToken.findUnique({
-        where: {token}
+        where: {tokenHash: hashToken(token)}
     });
     return passwordResetToken;
 } catch {

@@ -6,6 +6,8 @@ import { ResetSchema } from "@/schemas";
 import { getUserByEmail } from "@/data/user";
 import { sendPasswordResetEmail } from "@/lib/mail";
 import { generatePasswordResetToken } from "@/lib/tokens";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
+import { headers } from "next/headers";
 
 type ResetResult = {success?: string; error?: string; code: number};
 
@@ -16,6 +18,13 @@ export const reset = async (values: z.infer<typeof ResetSchema>): Promise<ResetR
     }
 
     const {email} = validatedFields.data;
+
+    const allowed =
+        await rateLimit(`reset:email:${email.toLowerCase()}`, 3, 60 * 60) &&
+        await rateLimit(`reset:ip:${clientIp(await headers())}`, 20, 60 * 60);
+    if (!allowed) {
+        return {error: "Too many attempts, please try again later.", code: 429};
+    }
 
     const existingUser = await getUserByEmail(email);
 

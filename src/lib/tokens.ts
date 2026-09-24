@@ -1,48 +1,27 @@
-import { getVerificationTokenByEmail } from '@/data/verification-token';
 import {db} from '@/lib/db';
-import {v4 as uuidv4} from 'uuid';
-import { getPasswordResetTokenByEmail } from '@/data/password-reset-token';
+import { createToken, hashToken } from '@/lib/token-hash';
 
+const TOKEN_LIFETIME_MS = 3600 * 1000;
+
+// Returns the plain token for the email link; only its hash is stored.
 export const generateVerificationToken = async (email: string) => {
-    const token = uuidv4();
-    const expires = new Date(new Date().getTime() + 3600*1000);
+    const token = createToken();
+    const expires = new Date(Date.now() + TOKEN_LIFETIME_MS);
 
-    const existingToken = await getVerificationTokenByEmail(email);
-
-    if (existingToken) {
-        await db.verificationToken.delete({
-            where: {id: existingToken.id},
-        })
-    }
-
-    const verificationToken = await db.verificationToken.create({
-        data: {
-            email,
-            token,
-            expires
-        }
+    await db.verificationToken.deleteMany({ where: { email } });
+    await db.verificationToken.create({
+        data: { email, tokenHash: hashToken(token), expires }
     });
-    return verificationToken;
+    return { email, token, expires };
 }
 
 export const generatePasswordResetToken = async (email: string) => {
-    const token = uuidv4();
-    const expires = new Date(new Date().getTime() + 3600*1000);
+    const token = createToken();
+    const expires = new Date(Date.now() + TOKEN_LIFETIME_MS);
 
-    const existingToken = await getPasswordResetTokenByEmail(email);
-
-    if (existingToken) {
-        await db.passwordResetToken.delete({
-            where: {id: existingToken.id},
-        })
-    }
-
-    const passwordResetToken = await db.passwordResetToken.create({
-        data: {
-            email,
-            token,
-            expires
-        }
+    await db.passwordResetToken.deleteMany({ where: { email } });
+    await db.passwordResetToken.create({
+        data: { email, tokenHash: hashToken(token), expires }
     });
-    return passwordResetToken;
+    return { email, token, expires };
 }

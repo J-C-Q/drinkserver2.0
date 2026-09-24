@@ -1,3 +1,4 @@
+import { formatCents } from "@/lib/money";
 import {
   Table,
   TableBody,
@@ -47,7 +48,7 @@ export const OrderTable = ({ orders }: OrderTableProps) => {
                 })}
               </TableCell>
               <TableCell>{order.itemname}</TableCell>
-              <TableCell>{order.itemprice.toFixed(2)}</TableCell>
+              <TableCell>{formatCents(order.priceCents)}</TableCell>
             </TableRow>
           ))}
       </TableBody>

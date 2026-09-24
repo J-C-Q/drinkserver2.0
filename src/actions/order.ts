@@ -60,7 +60,7 @@ export const order = async (itemid:string): Promise<OrderResult> => {
                     userId: existingUser.id,
                     username: existingUser.name!=null?existingUser.name:"",
                     itemname: existingItem.itemname,
-                    itemprice: existingItem.itemprice,
+                    priceCents: existingItem.priceCents,
                     date: new Date(),
                     status: "PENDING"
                 }

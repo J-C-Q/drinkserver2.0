@@ -40,6 +40,7 @@ export const updateAchievements = async () => {
 // define a type for the orders
 type Order = {
     date: Date;
+    itemid: string;
     itemname: string;
 }
 
@@ -70,15 +71,15 @@ function checkAchievement(orders: Order[], items: Item[], achievementName: strin
         case "Explorer":
             return checkExplorer(orders,items);
         case "Mate Mate Mate":
-            return checkMateMateMate(orders);
+            return checkMateMateMate(orders, items);
         case "Fritz":
-            return checkFritz(orders);
+            return checkFritz(orders, items);
         case "Frit":
-            return checkFrit(orders);
+            return checkFrit(orders, items);
         case "Philanthropist":
-            return checkPhilanthropist(orders);
+            return checkPhilanthropist(orders, items);
         case "Ahoj":
-            return checkAhoj(orders);
+            return checkAhoj(orders, items);
     }
 }
 
@@ -169,15 +170,16 @@ function checkSugarShock(orders: Order[], items: Item[]) {
 // True if on any Berlin calendar day the drinks add up to at least threshold,
 // including a single drink that reaches it on its own.
 function exceedsDailyTotal(orders: Order[], items: Item[], field: "caffeine" | "sugar", threshold: number) {
-    const amountByName: Map<string, number> = new Map();
+    // By id, not name: drinks get renamed, orders keep the old name.
+    const amountById: Map<string, number> = new Map();
     for (let item of items) {
-        amountByName.set(item.itemname, item[field] ?? 0);
+        amountById.set(item.itemid, item[field] ?? 0);
     }
 
     const totalPerDay: Map<string, number> = new Map();
     for (let order of orders) {
         const day = berlinDay(order.date);
-        const total = (totalPerDay.get(day) ?? 0) + (amountByName.get(order.itemname) ?? 0);
+        const total = (totalPerDay.get(day) ?? 0) + (amountById.get(order.itemid) ?? 0);
         if (total >= threshold) {
             return true;
         }
@@ -187,45 +189,46 @@ function exceedsDailyTotal(orders: Order[], items: Item[], field: "caffeine" | "
 }
 
 function checkExplorer(orders: Order[], items: Item[]) {
-    
-    const uniqueItemNames = new Set(orders.map(order => order.itemname));
-    const numberOfUniqueItems = uniqueItemNames.size;
-    if (numberOfUniqueItems==items.length){
-        return true
-    }
-    return false
+    // Every drink currently on offer has been ordered at least once.
+    const orderedIds = new Set(orders.map(order => order.itemid));
+    const available = items.filter(item => item.quantity > 0);
+    return available.length > 0 && available.every(item => orderedIds.has(item.itemid));
 }
 
-function checkMateMateMate(orders: Order[]) {
-    return checkMoreInAWeek(orders,"Mate Mate")
+function checkMateMateMate(orders: Order[], items: Item[]) {
+    return checkMoreInAWeek(orders, items, "Mate Mate")
 }
 
-function checkFritz(orders: Order[]){
-    return checkMoreInAWeek(orders,"Fritz Kola")
+function checkFritz(orders: Order[], items: Item[]) {
+    return checkMoreInAWeek(orders, items, "Fritz Kola")
 }
 
-function checkFrit(orders: Order[]) {
-    return checkMoreInAWeek(orders,"Fritz Kola Zuckerfrei")
+function checkFrit(orders: Order[], items: Item[]) {
+    return checkMoreInAWeek(orders, items, "Fritz Kola Zuckerfrei")
 }
 
-function checkAhoj(orders: Order[]) {
-    return checkMoreInAWeek(orders,"Fassbrause Zitrone")
+function checkAhoj(orders: Order[], items: Item[]) {
+    return checkMoreInAWeek(orders, items, "Fassbrause Zitrone")
 }
 
-function checkPhilanthropist(orders: Order[]) {
-    return checkMoreInAWeek(orders,"ChariTea Mate")
+function checkPhilanthropist(orders: Order[], items: Item[]) {
+    return checkMoreInAWeek(orders, items, "ChariTea Mate")
 }
 
-function checkMoreInAWeek(orders: Order[], itemname:string){
+function checkMoreInAWeek(orders: Order[], items: Item[], itemname:string){
     if (orders.length == 0) {
         return false;
     }
+    // Compare against the drink's current name, so orders placed before a
+    // rename still count.
+    const currentName: Map<string, string> = new Map(items.map(item => [item.itemid, item.itemname]));
+    const nameOf = (order: Order) => currentName.get(order.itemid) ?? order.itemname;
     let drinkThisWeek = 0;
     let notDrinkThisWeek = 0;
     let currentWeek = berlinWeek(orders[0].date);
     for (let order of orders){
         if (currentWeek==berlinWeek(order.date)){
-            if (order.itemname == itemname) {
+            if (nameOf(order) == itemname) {
                 drinkThisWeek += 1;
             } else {
                 notDrinkThisWeek +=1;
@@ -237,7 +240,7 @@ function checkMoreInAWeek(orders: Order[], itemname:string){
             if (drinkThisWeek > notDrinkThisWeek && (drinkThisWeek+notDrinkThisWeek >= 5)) {
                 return true
             }
-            if (order.itemname == itemname) {
+            if (nameOf(order) == itemname) {
                 drinkThisWeek = 1;
                 notDrinkThisWeek = 0
             } else {

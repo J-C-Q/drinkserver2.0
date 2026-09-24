@@ -100,7 +100,7 @@ const DrinksPage = async () => {
                 <DrinkEntry
                   drinkname={drink.itemname}
                   drinkid={drink.itemid}
-                  drinkprice={drink.itemprice}
+                  drinkPriceCents={drink.priceCents}
                   drinkquantity={drink.quantity}
                   drinkEnergy={drink.energy ? drink.energy : undefined}
                   drinkCarbohydrates={

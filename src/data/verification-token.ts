@@ -1,8 +1,9 @@
 import {db } from "@/lib/db";
+import { hashToken } from "@/lib/token-hash";
 
 export const getVerificationTokenByToken = async (token: string) => {
     try {
-        const verificationToken = await db.verificationToken.findUnique({ where: { token } });
+        const verificationToken = await db.verificationToken.findUnique({ where: { tokenHash: hashToken(token) } });
         return verificationToken;
     } catch {
         return null

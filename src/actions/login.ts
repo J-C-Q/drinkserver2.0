@@ -2,7 +2,7 @@
 
 import * as z from "zod";
 import bcrypt from "bcryptjs";
-import { AuthError } from "next-auth";
+import { AuthError, CredentialsSignin } from "next-auth";
 
 import {signIn} from "@/auth";
 import { LoginSchema } from "@/schemas";
@@ -10,6 +10,7 @@ import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { generateVerificationToken } from "@/lib/tokens";
 import { getUserByEmail } from "@/data/user";
 import { sendVerificationEmail } from "@/lib/mail";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const login = async (values: z.infer<typeof LoginSchema>) => {
     const validatedFields = LoginSchema.safeParse(values);
@@ -32,6 +33,9 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
         if (!passwordMatch) {
             return {error: "Invalid email or password!"};
         }
+        if (!(await rateLimit(`verify:email:${existingUser.email.toLowerCase()}`, 3, 60 * 60))) {
+            return {error: "Too many attempts, please try again later."};
+        }
         const verificationToken = await generateVerificationToken(existingUser.email);
         const sent = await sendVerificationEmail(verificationToken.email, verificationToken.token);
         if (!sent) {
@@ -51,6 +55,9 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
         if(error instanceof AuthError) {
             switch (error.type) {
                 case "CredentialsSignin":
+                    if ((error as CredentialsSignin).code === "rate_limited") {
+                        return {error: "Too many attempts, please try again later."};
+                    }
                     return {error: "Invalid email or password!"};
                 default:
                     return {error: "Something went wrong!"};

@@ -56,7 +56,12 @@ export const {
 
             return true;
         },
-        async jwt({token}) {
+        async jwt({token, user}) {
+            if (user) {
+                // Sign-in time as a custom claim: iat is reset whenever the
+                // middleware re-encodes the cookie, this claim is kept.
+                token.authTime = Date.now();
+            }
             if(!token.sub) {
                 return token;
             }
@@ -65,6 +70,16 @@ export const {
             if (!existingUser) {
                 return token;
             }
+
+            // Returning null ends sessions that began before the last password
+            // change. Sessions without authTime predate this check.
+            if (existingUser.passwordChangedAt) {
+                const authTime = typeof token.authTime === "number" ? token.authTime : 0;
+                if (authTime < existingUser.passwordChangedAt.getTime()) {
+                    return null;
+                }
+            }
+
             token.role = existingUser.role;
             return token;
         }

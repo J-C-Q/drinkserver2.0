@@ -1,6 +1,7 @@
 import { Courier_Prime } from "next/font/google";
 import { Order } from "@prisma/client";
 import { cn } from "@/lib/utils";
+import { formatCents } from "@/lib/money";
 import Image from "next/image";
 import {
   Table,
@@ -32,7 +33,7 @@ export const Receipt = ({ username, userid, orders }: ReceiptProps) => {
       acc[order.itemname] = [0, 0];
     }
     acc[order.itemname][0] += 1;
-    acc[order.itemname][1] += order.itemprice;
+    acc[order.itemname][1] += order.priceCents;
     return acc;
   }, {} as Record<string, number[]>);
   const ordersAsArray = Object.entries(ordersByItem ?? {});
@@ -108,7 +109,7 @@ export const Receipt = ({ username, userid, orders }: ReceiptProps) => {
                       {order[0]}
                     </TableCell>
                     <TableCell className="font-medium py-0 text-right">
-                      {order[1][1].toFixed(2)}
+                      {formatCents(order[1][1])}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -117,10 +118,10 @@ export const Receipt = ({ username, userid, orders }: ReceiptProps) => {
         </div>
         <div className="text-sm flex flex-row justify-between w-full pt-2 mt-2 items-center pb-10 pl-5 pr-3 z-10 border-t-2 border-dashed border-gray-400">
           <h1 className="font-semibold text-lg">Total</h1>
-          <h1 className="font-semibold text-lg">{total.toFixed(2)}</h1>
+          <h1 className="font-semibold text-lg">{formatCents(total)}</h1>
         </div>
       </div>
-      <PopupButton total={total} />
+      <PopupButton totalCents={total} />
     </div>
   );
 };

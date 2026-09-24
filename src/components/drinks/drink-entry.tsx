@@ -25,6 +25,7 @@ import {
 import { toast } from "sonner";
 
 import { order } from "@/actions/order";
+import { formatCents } from "@/lib/money";
 import { fetchItemQuantity } from "@/actions/fetch-item-quantity";
 import { use, useEffect, useState } from "react";
 import Image from "next/image";
@@ -33,7 +34,7 @@ import { useRouter } from "next/navigation";
 interface DrinkEntryProps {
   drinkname: string;
   drinkid: string;
-  drinkprice: number;
+  drinkPriceCents: number;
   drinkquantity: number;
   drinkEnergy?: number;
   drinkCarbohydrates?: number;
@@ -47,7 +48,7 @@ interface DrinkEntryProps {
 export const DrinkEntry = ({
   drinkname,
   drinkid,
-  drinkprice,
+  drinkPriceCents,
   drinkquantity,
   drinkEnergy,
   drinkCarbohydrates,
@@ -180,7 +181,7 @@ export const DrinkEntry = ({
         >
           {/* <p className="whitespace-nowrap text-center w-full">
             Buy for
-            <span className="font-semibold"> {drinkprice.toFixed(2)}€</span>?
+            <span className="font-semibold"> {formatCents(drinkPriceCents)}€</span>?
           </p> */}
           <span
             className={
@@ -217,7 +218,7 @@ export const DrinkEntry = ({
             >
               <span className="text-xl font-semibold">
                 Buy for
-                <span className="font-semibold"> {drinkprice.toFixed(2)}€</span>
+                <span className="font-semibold"> {formatCents(drinkPriceCents)}€</span>
               </span>
             </Button>
           </DrawerClose>

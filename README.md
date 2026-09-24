@@ -33,9 +33,13 @@ Schema changes are Prisma migrations in `prisma/migrations`. `0_init` is the bas
 2. Before deploying: back up production and pass the restore test.
 3. `npx prisma migrate deploy` applies pending migrations to the database in `.env`.
 
-One-time setup for an existing production database (created with `prisma db push`), after a backup:
+One-time setup for an existing production database (created with `prisma db push`), after a backup. `0_init` describes the schema as it was before migration `1_…`, so this must run before `1_…` is deployed:
 
 ```
-npx prisma migrate diff --from-url "$DIRECT_URL" --to-schema-datamodel prisma/schema.prisma --exit-code   # exit 0: no drift
 npx prisma migrate resolve --applied 0_init
+npx prisma migrate deploy
 ```
+
+Each migration runs in a single transaction. If `migrate deploy` fails, the database is left unchanged, but Prisma records the migration as failed and refuses further deploys. Fix the cause, then `npx prisma migrate resolve --rolled-back <migration name>` and deploy again.
+
+Deploy the migration and the matching code together: the code after `1_money_cents_relations_payments_tokens` expects `priceCents`, and the code before it expects `itemprice`.

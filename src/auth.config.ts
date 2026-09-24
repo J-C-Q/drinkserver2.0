@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import type { NextAuthConfig } from "next-auth";
+import { CredentialsSignin, type NextAuthConfig } from "next-auth";
 import type { UserRole } from "@prisma/client";
 import Credentials from "next-auth/providers/credentials";
 import Github from "next-auth/providers/github";
@@ -7,6 +7,12 @@ import Google from "next-auth/providers/google";
 import AppleProvider from "next-auth/providers/apple"
 import {LoginSchema} from "@/schemas";
 import {getUserByEmail} from "@/data/user";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
+
+// Lets the login form tell "too many attempts" apart from a wrong password.
+export class RateLimitedSignin extends CredentialsSignin {
+  code = "rate_limited";
+}
 
 export default {
   providers: [
@@ -24,12 +30,21 @@ export default {
         issuer: "https://github.com/login/oauth",
     }),
     Credentials({ 
-    async authorize(credentials) {
+    async authorize(credentials, request) {
 
     const validatedFields = LoginSchema.safeParse(credentials);
     if (validatedFields.success) {
 
       const {email,password} = validatedFields.data;
+
+      // Checked here so both the login form and a direct POST to the
+      // credentials callback are limited, before any password hashing.
+      const allowed =
+        await rateLimit(`login:email:${email.toLowerCase()}`, 10, 15 * 60) &&
+        await rateLimit(`login:ip:${clientIp(request.headers)}`, 50, 15 * 60);
+      if (!allowed) {
+        throw new RateLimitedSignin();
+      }
 
       const user = await getUserByEmail(email);
       if(!user || !user.password) {

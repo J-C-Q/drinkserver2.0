@@ -1,4 +1,5 @@
 "use client";
+import { formatCents } from "@/lib/money";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import {
@@ -15,9 +16,9 @@ import { PayButton } from "./pay-button";
 import { HiMiniInformationCircle } from "react-icons/hi2";
 import { PiWarningOctagonFill } from "react-icons/pi";
 interface PopupButtonProps {
-  total: number;
+  totalCents: number;
 }
-export const PopupButton = ({ total }: PopupButtonProps) => {
+export const PopupButton = ({ totalCents }: PopupButtonProps) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -66,7 +67,7 @@ export const PopupButton = ({ total }: PopupButtonProps) => {
             label={"Paypal.me"}
             href={
               "https://paypal.me/officeDrinks/" +
-              total.toFixed(2) +
+              formatCents(totalCents) +
               "EUR?country.x=DE&locale.x=de_DE/"
             }
           />

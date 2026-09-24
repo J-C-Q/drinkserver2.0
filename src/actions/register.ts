@@ -8,6 +8,8 @@ import { RegisterSchema } from "@/schemas";
 import { getUserByEmail } from "@/data/user";
 import { generateVerificationToken } from "@/lib/tokens";
 import { sendVerificationEmail } from "@/lib/mail";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
+import { headers } from "next/headers";
 
 
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
@@ -17,6 +19,10 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
         return { error: "Invalid fields!", code: 400 };
     }
     const { email, password, name } = validatedFields.data;
+
+    if (!(await rateLimit(`register:ip:${clientIp(await headers())}`, 10, 60 * 60))) {
+        return { error: "Too many attempts, please try again later.", code: 429 };
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
 
 
