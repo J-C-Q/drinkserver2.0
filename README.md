@@ -21,6 +21,14 @@ Requires Node.js and PostgreSQL (for example `brew install postgresql@16 && brew
 
 The service worker (`src/app/sw.ts`, built with Serwist) is disabled in development. It caches only static assets; pages and API responses always go to the network.
 
+## Tests
+
+- `npm run test:unit`: unit tests (Berlin calendar boundaries, money parsing), no database needed.
+- `npm run test:migrations`: builds a scratch database at the old schema with legacy data, applies the migrations and checks the conversions. Needs `ADMIN_DATABASE_URL` pointing at a local server, e.g. `postgresql://<you>@localhost:5432/postgres`.
+- `npm run test:integration`: end-to-end checks against a running app (authorization, stock races, payments, sessions, rate limits). Start the app first, then run with `DATABASE_URL` set to the same local database. **It deletes all orders and payments and reseeds the test data**, so it refuses non-local databases.
+
+CI (`.github/workflows/ci.yml`) runs lint, typecheck, unit tests and a dependency audit, then the migration and integration tests against PostgreSQL 15 and a production build.
+
 ## Database backups
 
 `scripts/backup-db.sh` dumps the database behind `DIRECT_URL` in `.env` to `backups/` (gitignored), with the row count of every table. `scripts/restore-test.sh <file.dump>` restores it into a throwaway local database and checks the counts. A backup counts only once the restore test passes. Dumps contain personal data and password hashes; keep them private.
@@ -42,4 +50,4 @@ npx prisma migrate deploy
 
 Each migration runs in a single transaction. If `migrate deploy` fails, the database is left unchanged, but Prisma records the migration as failed and refuses further deploys. Fix the cause, then `npx prisma migrate resolve --rolled-back <migration name>` and deploy again.
 
-Deploy the migration and the matching code together: the code after `1_money_cents_relations_payments_tokens` expects `priceCents`, and the code before it expects `itemprice`.
+Additive migrations (such as `2_order_nutrition_snapshot`, which only adds columns) can be deployed before the code that uses them, without downtime. Deploy the migration and the matching code together when a migration changes existing columns: the code after `1_money_cents_relations_payments_tokens` expects `priceCents`, and the code before it expects `itemprice`.

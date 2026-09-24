@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm run test:unit
+      - name: Dependency audit
+        run: npm audit --omit=dev --audit-level=high
+
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        # Same major version as production.
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: drinkserver_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/drinkserver_test
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/drinkserver_test
+      ADMIN_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+      # Test-only values; no email is sent without RESEND_API_KEY.
+      AUTH_SECRET: ci-only-secret-for-the-throwaway-test-database
+      AUTH_TRUST_HOST: "true"
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      - name: Migrations from the old schema
+        run: npm run test:migrations
+      - run: npx prisma migrate deploy
+      - run: npm run build
+      - name: Start the app
+        run: |
+          npm start > app.log 2>&1 &
+          for i in $(seq 1 60); do
+            curl -sf -o /dev/null http://localhost:3000/auth/login && exit 0
+            sleep 1
+          done
+          cat app.log
+          exit 1
+      - name: Integration tests
+        run: npm run test:integration
+      - name: App log
+        if: failure()
+        run: cat app.log

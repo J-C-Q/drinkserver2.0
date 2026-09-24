@@ -7,6 +7,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  // Base for relative Open Graph image URLs; matches openGraph.url below.
+  metadataBase: new URL("https://drinkserver2.vercel.app"),
   title: "Drink Server 2.0",
   description: "Monitor Your Drink Intake Effortlessly",
   manifest: "/manifest.json",
