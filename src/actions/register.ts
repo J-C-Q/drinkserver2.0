@@ -7,7 +7,7 @@ import { db } from "@/lib/db";
 import { RegisterSchema } from "@/schemas";
 import { getUserByEmail } from "@/data/user";
 import { generateVerificationToken } from "@/lib/tokens";
-import { sendVerificationEmail } from "@/lib/mail";
+import { sendAccountExistsEmail, sendVerificationEmail } from "@/lib/mail";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { headers } from "next/headers";
 
@@ -28,8 +28,13 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
 
     const existingUser = await getUserByEmail(email);
 
+    // Same response as a new registration, so the form does not reveal which
+    // addresses have accounts; the owner is told by email instead.
     if (existingUser) {
-        return { error: "Email already in use!", code: 400 };
+        if (await rateLimit(`register:email:${email.toLowerCase()}`, 3, 60 * 60)) {
+            await sendAccountExistsEmail(email);
+        }
+        return { success: "Confirmation email sent!", code: 200 };
     }
 
     await db.user.create({

@@ -7,7 +7,7 @@ import Google from "next-auth/providers/google";
 import AppleProvider from "next-auth/providers/apple"
 import {LoginSchema} from "@/schemas";
 import {getUserByEmail} from "@/data/user";
-import { clientIp, rateLimit } from "@/lib/rate-limit";
+import { clientIp, loginAttemptAllowed } from "@/lib/rate-limit";
 
 // Lets the login form tell "too many attempts" apart from a wrong password.
 export class RateLimitedSignin extends CredentialsSignin {
@@ -39,10 +39,7 @@ export default {
 
       // Checked here so both the login form and a direct POST to the
       // credentials callback are limited, before any password hashing.
-      const allowed =
-        await rateLimit(`login:email:${email.toLowerCase()}`, 10, 15 * 60) &&
-        await rateLimit(`login:ip:${clientIp(request.headers)}`, 50, 15 * 60);
-      if (!allowed) {
+      if (!(await loginAttemptAllowed(email, clientIp(request.headers)))) {
         throw new RateLimitedSignin();
       }
 

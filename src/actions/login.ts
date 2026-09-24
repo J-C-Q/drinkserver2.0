@@ -10,7 +10,8 @@ import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { generateVerificationToken } from "@/lib/tokens";
 import { getUserByEmail } from "@/data/user";
 import { sendVerificationEmail } from "@/lib/mail";
-import { rateLimit } from "@/lib/rate-limit";
+import { clientIp, loginAttemptAllowed, rateLimit } from "@/lib/rate-limit";
+import { headers } from "next/headers";
 
 export const login = async (values: z.infer<typeof LoginSchema>) => {
     const validatedFields = LoginSchema.safeParse(values);
@@ -28,6 +29,11 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     }
 
     if(!existingUser.emailVerified) {
+        // This branch checks the password itself, without the credentials
+        // provider, so it applies the same attempt limit first.
+        if (!(await loginAttemptAllowed(email, clientIp(await headers())))) {
+            return {error: "Too many attempts, please try again later."};
+        }
         // Only resend verification mail to someone who knows the password.
         const passwordMatch = await bcrypt.compare(password, existingUser.password);
         if (!passwordMatch) {

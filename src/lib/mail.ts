@@ -47,3 +47,9 @@ export const sendVerificationEmail = async (email: string, token: string) => {
     const confirmLink = `${domain}/auth/new-verification?token=${token}`;
     return sendEmail(email, "Confirm your email", `<p>Click <a href="${confirmLink}">here</a> to confirm your email.</p>`);
 };
+
+// Sent instead of a confirmation when someone registers with an address that
+// already has an account, so the register form reveals nothing.
+export const sendAccountExistsEmail = async (email: string) => {
+    return sendEmail(email, "You already have an account", `<p>Someone tried to register a Drink Server account with this address, but it already has one. You can <a href="${domain}/auth/login">log in</a> or <a href="${domain}/auth/reset">reset your password</a>. If this wasn't you, you can ignore this email.</p>`);
+};

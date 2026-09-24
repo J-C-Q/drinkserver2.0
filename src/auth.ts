@@ -65,10 +65,21 @@ export const {
             if(!token.sub) {
                 return token;
             }
-            const existingUser = await getUserById(token.sub);
+            // Fail closed: a deleted user or a failed lookup ends the session
+            // instead of keeping the role stored in the cookie.
+            let existingUser;
+            try {
+                existingUser = await db.user.findUnique({
+                    where: {id: token.sub},
+                    select: {role: true, passwordChangedAt: true},
+                });
+            } catch (error) {
+                console.error("[auth] user lookup failed, ending session:", error);
+                return null;
+            }
 
             if (!existingUser) {
-                return token;
+                return null;
             }
 
             // Returning null ends sessions that began before the last password

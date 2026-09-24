@@ -25,11 +25,16 @@ export const rateLimit = async (key: string, limit: number, windowSeconds: numbe
         }
         return rows[0].count <= limit;
     } catch (error) {
-        // Without the database nothing else works either; don't block on it.
-        console.error("[rateLimit] check failed, allowing request:", error);
-        return true;
+        // Fail closed: a broken limiter must not silently disable throttling.
+        console.error("[rateLimit] check failed, refusing request:", key, error);
+        return false;
     }
 };
+
+// Shared by every path that checks a password, so no path is unlimited.
+export const loginAttemptAllowed = async (email: string, ip: string) =>
+    await rateLimit(`login:email:${email.toLowerCase()}`, 10, 15 * 60) &&
+    await rateLimit(`login:ip:${ip}`, 50, 15 * 60);
 
 // Client address as set by Vercel, which overwrites x-forwarded-for.
 export const clientIp = (headers: Headers) =>
