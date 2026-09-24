@@ -39,3 +39,6 @@ next-env.d.ts
 /public/sw.*
 /public/workbox-*
 /public/swe-worker-*
+
+# database backups (personal data)
+/backups/
