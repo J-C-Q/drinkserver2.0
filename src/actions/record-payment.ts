@@ -1,9 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 
 import { db } from "@/lib/db";
 import { currentAdmin } from "@/lib/auth-guard";
+import { awardAchievements } from "@/lib/achievements";
 import { formatCents } from "@/lib/money";
 
 type PaymentResult = { success?: string; error?: string; code: number };
@@ -85,8 +87,17 @@ export const recordPayment = async (
             }
         });
 
+        // Payment achievements; awarded like after an order.
+        after(async () => {
+            try {
+                await awardAchievements(userId);
+            } catch (error) {
+                console.error("[achievements] award failed for", userId, error);
+            }
+        });
         revalidatePath("/admin");
         revalidatePath("/dashboard");
+        revalidatePath("/stats");
 
         const extra = amountCents - snapshot.cents;
         const note = extra === 0 ? "" : ` Received ${formatCents(extra)} more than the orders total.`;

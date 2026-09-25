@@ -113,6 +113,7 @@ model Order {
   @@index([userId, date])
   @@index([status])
   @@index([paymentId])
+  @@index([date])
 }
 
 // A payment an admin confirmed, and the exact orders it settled.

@@ -57,6 +57,7 @@ check "plaintext tokens removed" "$(q 'select (select count(*) from "Verificatio
 check "token columns hashed"     "$(q "select string_agg(table_name||'.'||column_name, ',' order by table_name) from information_schema.columns where column_name in ('token','tokenHash')")" "PasswordResetToken.tokenHash,VerificationToken.tokenHash"
 check "nutrition backfilled from items" "$(q "select string_agg(\"orderId\"||'='||coalesce(sugar::text,'-')||'/'||coalesce(caffeine::text,'-'), ',' order by \"orderId\") from \"Order\"")" "o1=25/100,o2=33/-,o3=33/-,o4=25/100"
 check "duplicate achievements removed, order kept" "$(q "select achievements from \"User\" where id='u1'")" "{ach-b,ach-a,ach-c}"
+check "new achievements added"   "$(q "select count(*) from \"Achievement\" where name in ('Legend','Last One','Top of the Month')")" "3"
 check "statuses unchanged"       "$(q "select string_agg(status::text, ',' order by \"orderId\") from \"Order\"")" "PENDING,COMPLETED,COMPLETED,PENDING"
 check "foreign keys exist"       "$(q "select string_agg(conname, ',' order by conname) from pg_constraint where contype='f' and conrelid in ('\"Order\"'::regclass, '\"Payment\"'::regclass)")" "Order_itemid_fkey,Order_paymentId_fkey,Order_userId_fkey,Payment_confirmedById_fkey,Payment_userId_fkey"
 check "user with orders can't be deleted" "$(q "delete from \"User\" where id='u1'" 2>&1)" "Order_userId_fkey"

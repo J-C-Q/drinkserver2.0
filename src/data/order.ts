@@ -14,11 +14,29 @@ export const getOrdersForUser = async (userId: string) => {
         // Chronological and without cancelled orders: the achievement checks
         // compare adjacent orders.
         const dates = await db.order.findMany({
-            select: {date: true, itemid: true, itemname: true, sugar: true, caffeine: true},
+            select: {date: true, itemid: true, itemname: true, priceCents: true, sugar: true, caffeine: true},
             where: {userId, status: {not: "CANCELLED"}},
             orderBy: {date: "asc"},
         });
         return dates;
+    } catch {
+        return null
+    }
+}
+
+// The user's payments, each with the oldest order it settled.
+export const getPaymentsForUser = async (userId: string) => {
+    try {
+        const payments = await db.payment.findMany({
+            select: {
+                amountCents: true,
+                ordersCents: true,
+                createdAt: true,
+                orders: {select: {date: true}, orderBy: {date: "asc"}, take: 1},
+            },
+            where: {userId},
+        });
+        return payments.map(({orders, ...payment}) => ({...payment, oldestOrderDate: orders[0]?.date ?? null}));
     } catch {
         return null
     }

@@ -5,6 +5,7 @@ import { after } from "next/server";
 
 import {db} from "@/lib/db";
 import { awardAchievements } from "@/lib/achievements";
+import { addAchievementToUserByName } from "@/data/achievements";
 
 import { getUserById } from "@/data/user";
 import { currentUser } from "@/lib/auth-guard";
@@ -68,6 +69,12 @@ export const order = async (itemid:string): Promise<OrderResult> => {
                     status: "PENDING"
                 }
             });
+
+            // existingItem was read after the decrement: this was the last one.
+            // Awarded here because the history cannot tell afterwards.
+            if(existingItem.quantity === 0) {
+                await addAchievementToUserByName(tx, existingUser.id, "Last One");
+            }
 
             return {success: `${existingUser.name} ordered ${existingItem.itemname}!`, code: 200};
         });

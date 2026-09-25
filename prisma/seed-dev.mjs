@@ -32,6 +32,7 @@ const items = [
     { itemname: "Last One", priceCents: 200, quantity: 1, sugar: 10, caffeine: 50, energy: 80, carbohydrate: 10, image: "/drinkImages/bgAfri-Cola.png", color: "white", bgcolor: "rot" },
 ];
 
+// The achievements from before migrations; 4_more_achievements adds the rest.
 const achievementNames = [
     "First Drink", "Night Owl", "Early Bird", "Weekend Warrior", "Thirsty", "Junkie",
     "Caffein Bomb", "Caffein Overdose", "Sugar Shock", "Regular", "Loyal", "Explorer",

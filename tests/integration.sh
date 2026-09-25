@@ -27,6 +27,7 @@ cleanup(){
     q "alter table if exists \"RateLimit_off\" rename to \"RateLimit\"" >/dev/null 2>&1
     q "update \"User\" set role='ADMIN' where email='admin@test.local'" >/dev/null 2>&1
     q "delete from \"User\" where id='tmp-admin'" >/dev/null 2>&1
+    q "delete from \"Order\" where \"userId\"='tmp-ach'; delete from \"User\" where id='tmp-ach'" >/dev/null 2>&1
     rm -rf "$T"
 }
 trap cleanup EXIT
@@ -67,6 +68,10 @@ for a in ORDER PAY LOGIN RESET NEWPW REGISTER; do [[ -n "${!a}" ]] || { echo "se
 CLUB=$(q "select itemid from \"Item\" where itemname='Club Mate'"); LAST=$(q "select itemid from \"Item\" where itemname='Last One'")
 FRITZ=$(q "select itemid from \"Item\" where itemname='Fritz Kola'")
 U1=$(q "select id from \"User\" where email='user@test.local'"); U2=$(q "select id from \"User\" where email='user2@test.local'")
+ADMIN=$(q "select id from \"User\" where email='admin@test.local'")
+# has <user id> <achievement name>: t or f. awaits: the same, waiting for awards made after the response.
+has(){ q "select exists(select 1 from \"User\" u join \"Achievement\" a on a.id = any(u.achievements) where u.id='$1' and a.name='$2')"; }
+awaits(){ local r=f; for _ in $(seq 1 20); do r=$(has "$1" "$2"); [[ "$r" == t ]] && break; sleep 0.5; done; echo "$r"; }
 
 echo "== access"
 check "session has id+role"      "$(curl -s -b "$T/admin.jar" "$B/api/auth/session")" '"role":"ADMIN"'
@@ -91,6 +96,7 @@ check "order stores nutrition"   "$(q "select string_agg(distinct o.sugar||'/'||
 # Achievements are awarded after the response, so wait for them.
 awarded=f; for _ in $(seq 1 20); do [[ "$(q "select coalesce(array_length(achievements,1),0) > 0 from \"User\" where id='$U1'")" == t ]] && { awarded=t; break; }; sleep 0.5; done
 check "achievement awarded after purchase" "$awarded" "t"
+check "first Club Mate ever: Trendsetter" "$(awaits "$U1" Trendsetter)" "t"
 check "user2 orders Fritz"       "$(actr user2.jar /drinks "$ORDER" "[\"$FRITZ\"]")" "Second User ordered"
 # Concurrent orders start concurrent award runs; each achievement may be stored once.
 for i in 1 2 3 4 5; do actr user2.jar /drinks "$ORDER" "[\"$CLUB\"]" > /dev/null & done; wait
@@ -103,6 +109,8 @@ for i in 1 2 3 4 5; do actr user.jar /drinks "$ORDER" "[\"$LAST\"]" > "$T/r_u$i"
 check "race: 1 success"          "$(cat "$T"/r_* | grep -o 'ordered Last One' | wc -l | tr -d ' ')" "1"
 check "race: 9 out of stock"     "$(cat "$T"/r_* | grep -o 'out of stock' | wc -l | tr -d ' ')" "9"
 check "race: stock 0, 1 order"   "$(q "select quantity from \"Item\" where itemid='$LAST'")/$(q "select count(*) from \"Order\" where itemid='$LAST'")" "0/1"
+WINNER=$(q "select \"userId\" from \"Order\" where itemid='$LAST'"); LOSER=$([[ "$WINNER" == "$U1" ]] && echo "$U2" || echo "$U1")
+check "last bottle: Last One"    "$(has "$WINNER" "Last One")/$(has "$LOSER" "Last One")" "t/f"
 check "DB refuses negative stock" "$(q "update \"Item\" set quantity=-1 where itemid='$LAST'" 2>&1)" "Item_quantity_nonnegative"
 check "DB refuses negative price" "$(q "update \"Item\" set \"priceCents\"=-1 where itemid='$LAST'" 2>&1)" "Item_priceCents_nonnegative"
 check "sold-out item hidden"     "$(body user.jar /drinks | grep -c 'bgAfri-Cola')" "0"
@@ -142,6 +150,8 @@ check "late order still pending" "$(q "select status from \"Order\" where \"orde
 check "user2 orders untouched"   "$(q "select count(*) from \"Order\" where status<>'PENDING' and \"userId\"='$U2'")" "0"
 check "same snapshot again refused" "$(actr admin.jar /admin "$PAY" "[\"$U1\",$S1,$C1]")" "changed in the meantime"
 check "overpayment recorded"     "$(actr admin.jar /admin "$PAY" "[\"$U1\",$(snapshot "$U1"),200]")" "0.50 more than"
+check "payment achievements awarded" "$(awaits "$U1" "Clean Slate")/$(awaits "$U1" "Tip Jar")/$(awaits "$U1" "Good Standing")" "t/t/t"
+check "no payment, no Clean Slate" "$(has "$U2" "Clean Slate")" "f"
 check "admin page lists payments" "$(body admin.jar /admin | sed 's/<!-- -->//g')" "Ref: PP-REF-1"
 check "admin amounts in euro"    "$(body admin.jar /admin | sed 's/<!-- -->//g' | grep -oE 'Total Completed Money: [0-9.]+€|amount: \$' | sort -u | tr '\n' ' ')" "€"
 check "admin shows no dollar amounts" "$(body admin.jar /admin | sed 's/<!-- -->//g' | grep -c 'amount: \$')" "0"
@@ -216,6 +226,25 @@ if [[ -n "${CRON_SECRET:-}" ]]; then
 else
     echo "SKIP  authorized cron checks (CRON_SECRET not set)"
 fi
+
+echo "== achievements from everyone's orders"
+# ins <user id> <SQL timestamp>: a Club Mate order at that time.
+ins(){ q "insert into \"Order\"(\"orderId\",\"userId\",username,itemid,itemname,\"priceCents\",date,status) values (gen_random_uuid()::text,'$1','x','$CLUB','Club Mate',150,$2,'PENDING')" >/dev/null; }
+q "insert into \"User\"(id,name,email,\"emailVerified\",authorized,password,role,achievements) values ('tmp-ach','Temp Drinker','tmp-ach@test.local',now(),true,'x','USER','{}')" >/dev/null
+check "one other person nearby: no Happy Hour" "$(has "$U1" "Happy Hour")" "f"
+for u in "$U2" "$ADMIN" tmp-ach; do ins "$u" "(now() at time zone 'utc') - interval '2 minutes'"; done
+actr user.jar /drinks "$ORDER" "[\"$CLUB\"]" >/dev/null
+check "three others nearby: Happy Hour" "$(awaits "$U1" "Happy Hour")" "t"
+# Everyone's award runs so far saw only this month, which has not ended yet.
+LEADER=$(q "select \"userId\" from \"Order\" group by 1 order by count(*) desc limit 1")
+check "current month does not count yet" "$([[ "$LEADER" == "$U1" || "$LEADER" == "$U2" ]] && has "$LEADER" "Top of the Month")" "f"
+# Last month in Berlin: user 2 has 3 drinks, user 1 one.
+LASTMONTH="(date_trunc('month', now() at time zone 'Europe/Berlin') - interval '5 days') at time zone 'Europe/Berlin' at time zone 'utc'"
+for i in 1 2 3; do ins "$U2" "$LASTMONTH"; done; ins "$U1" "$LASTMONTH"
+actr user2b.jar /drinks "$ORDER" "[\"$CLUB\"]" >/dev/null; actr user.jar /drinks "$ORDER" "[\"$CLUB\"]" >/dev/null
+check "most drinks last month: Top of the Month" "$(awaits "$U2" "Top of the Month")" "t"
+sleep 1
+check "fewer drinks: no Top of the Month" "$(has "$U1" "Top of the Month")" "f"
 
 echo "---- $pass passed, $fail failed"
 [[ $fail -eq 0 ]]
